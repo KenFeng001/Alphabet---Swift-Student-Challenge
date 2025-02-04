@@ -2,10 +2,16 @@ import SwiftUI
 
 struct ViewfinderImagePreview: View {
     @Environment(\.dismiss) private var dismiss // 用于返回的环境变量
+    var imageData: Data // 新增属性，用于接收图像数据
     
     var body: some View {
         ZStack {
             Color.black // 背景颜色
+            if let uiImage = UIImage(data: imageData) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFit()
+            }
             Text("Preview")
                 .foregroundColor(.white)
                 .font(.largeTitle)
@@ -34,5 +40,5 @@ struct ViewfinderImagePreview: View {
 }
 
 #Preview {
-    ViewfinderImagePreview()
+    ViewfinderImagePreview(imageData: Data())
 }

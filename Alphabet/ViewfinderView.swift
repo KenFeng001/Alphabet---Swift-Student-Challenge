@@ -1,5 +1,4 @@
-//
-//  ViewfinderView.swift
+////  ViewfinderView.swift
 //  Alphabet
 //
 //  Created by Zile Feng on 03/02/2025.
@@ -10,7 +9,7 @@ import SwiftUI
 struct ViewfinderView: View {
     @StateObject var model = DataModel()
     @Environment(\.dismiss) private var dismiss
-    @State private var navigateToPreview = false // 新增状态变量
+    @State private var navigateToPreview = false
     
     var body: some View {
         NavigationStack {
@@ -56,7 +55,7 @@ struct ViewfinderView: View {
                     Spacer()
                     Button(action: {
                         model.camera.takePhoto()
-                        navigateToPreview = true // 设置导航状态
+                        navigateToPreview = true
                     }) {
                         Circle()
                             .stroke(Color.white, lineWidth: 3)
@@ -65,7 +64,7 @@ struct ViewfinderView: View {
                             .padding(.bottom, 30)
                     }
                     .background(
-                        NavigationLink(destination: ViewfinderImagePreview(), isActive: $navigateToPreview) {
+                        NavigationLink(destination: ViewfinderImagePreview(imageData: model.capturedImageData ?? Data()), isActive: $navigateToPreview) {
                             EmptyView()
                         }
                     )
@@ -83,3 +82,4 @@ struct ViewfinderView: View {
 #Preview {
     ViewfinderView(model: DataModel())
 }
+

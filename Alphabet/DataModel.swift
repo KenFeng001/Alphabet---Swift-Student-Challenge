@@ -14,6 +14,7 @@ final class DataModel: ObservableObject {
     
     @Published var viewfinderImage: Image?
     @Published var thumbnailImage: Image?
+    @Published var capturedImageData: Data?
     @Published var isPhotosLoaded = false
         
     init() {
@@ -45,8 +46,9 @@ final class DataModel: ObservableObject {
             Task { @MainActor in
                 isPhotosLoaded = true
                 logger.error("Photos loaded")
+                
             }
-            savePhoto(imageData: photoData.imageData)
+//            savePhoto(imageData: photoData.imageData)
         }
     }
     
