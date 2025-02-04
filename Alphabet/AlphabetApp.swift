@@ -11,7 +11,7 @@ import SwiftUI
 struct AlphabetApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ViewfinderView()
         }
     }
 }

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ViewfinderView: View {
-    @ObservedObject var model = DataModel()
+    @StateObject var model = DataModel()
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
@@ -16,16 +16,14 @@ struct ViewfinderView: View {
             // 相机预览
             GeometryReader { geometry in
                 if let image = model.viewfinderImage {
-                    image
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: geometry.size.width-30, height: geometry.size.width-50)
-                        .clipped()
-                        .position(x: geometry.size.width/2, y: geometry.size.height/2)
-                } else {
-                    Color.gray
-                        .frame(width: geometry.size.width-10, height: geometry.size.width-10)
-                        .position(x: geometry.size.width/2, y: geometry.size.height/2)
+                        image.resizable()
+                            .scaledToFill()
+                            .frame(width: geometry.size.width-10, height: geometry.size.width-10)
+                            .position(x: geometry.size.width/2, y: geometry.size.height/2)
+                            .cornerRadius(50)
+                }
+                else {
+                    Text("Image not available")
                 }
             }
             
