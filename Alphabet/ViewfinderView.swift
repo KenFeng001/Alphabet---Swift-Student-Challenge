@@ -10,60 +10,72 @@ import SwiftUI
 struct ViewfinderView: View {
     @StateObject var model = DataModel()
     @Environment(\.dismiss) private var dismiss
+    @State private var navigateToPreview = false // 新增状态变量
     
     var body: some View {
-        ZStack {
-            // 相机预览
-            GeometryReader { geometry in
-                if let image = model.viewfinderImage {
-                        image.resizable()
+        NavigationStack {
+            ZStack {
+                // 相机预览
+                GeometryReader { geometry in
+                    if let image = model.viewfinderImage {
+                        image
+                            .resizable()
                             .scaledToFill()
-                            .frame(width: geometry.size.width-10, height: geometry.size.width-10)
-                            .position(x: geometry.size.width/2, y: geometry.size.height/2)
-                            .cornerRadius(50)
+                            .frame(width: geometry.size.width - 10, height: geometry.size.width - 10)
+                            .cornerRadius(10)
+                            .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
+                    } else {
+                        Color.gray
+                            .frame(width: geometry.size.width - 10, height: geometry.size.width - 10)
+                            .cornerRadius(10)
+                            .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
+                    }
                 }
-                else {
-                    Text("Image not available")
-                }
-            }
-            
-            // 返回按钮
-            VStack {
-                HStack {
-                    Button(action: {
-                        dismiss()
-                    }) {
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 20, weight: .semibold))
-                            .foregroundColor(.white)
-                            .padding()
-                            .background(Circle().fill(Color.black.opacity(0.5)))
-                            .padding(.leading, 20)
+                
+                // 返回按钮
+                VStack {
+                    HStack {
+                        Button(action: {
+                            dismiss()
+                        }) {
+                            Image(systemName: "chevron.left")
+                                .font(.system(size: 20, weight: .semibold))
+                                .foregroundColor(.white)
+                                .padding()
+                                .background(Circle().fill(Color.black.opacity(0.5)))
+                                .padding(.leading, 20)
+                        }
+                        Spacer()
                     }
                     Spacer()
                 }
-                Spacer()
-            }
-            .padding(.top, 20)
-            
-            // 快门按钮
-            VStack {
-                Spacer()
-                Button(action: {
-                    model.camera.takePhoto()
-                }) {
-                    Circle()
-                        .stroke(Color.white, lineWidth: 3)
-                        .frame(width: 65, height: 65)
-                        .background(Circle().fill(Color.white.opacity(0.2)))
-                        .padding(.bottom, 30)
+                .padding(.top, 20)
+                
+                // 快门按钮
+                VStack {
+                    Spacer()
+                    Button(action: {
+                        model.camera.takePhoto()
+                        navigateToPreview = true // 设置导航状态
+                    }) {
+                        Circle()
+                            .stroke(Color.white, lineWidth: 3)
+                            .frame(width: 65, height: 65)
+                            .background(Circle().fill(Color.white.opacity(0.2)))
+                            .padding(.bottom, 30)
+                    }
+                    .background(
+                        NavigationLink(destination: ViewfinderImagePreview(), isActive: $navigateToPreview) {
+                            EmptyView()
+                        }
+                    )
                 }
             }
-        }
-        .background(Color.black)
-        .ignoresSafeArea()
-        .task {
-            await model.camera.start()
+            .background(Color.black)
+            .ignoresSafeArea()
+            .task {
+                await model.camera.start()
+            }
         }
     }
 }

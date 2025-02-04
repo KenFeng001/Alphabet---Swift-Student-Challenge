@@ -14,9 +14,8 @@ final class DataModel: ObservableObject {
     
     @Published var viewfinderImage: Image?
     @Published var thumbnailImage: Image?
-    
-    var isPhotosLoaded = false
-    
+    @Published var isPhotosLoaded = false
+        
     init() {
         Task {
             await handleCameraPreviews()
@@ -44,9 +43,10 @@ final class DataModel: ObservableObject {
         
         for await photoData in unpackedPhotoStream {
             Task { @MainActor in
-                thumbnailImage = photoData.thumbnailImage
+                isPhotosLoaded = true
+                logger.error("Photos loaded")
             }
-            //savePhoto(imageData: photoData.imageData)
+            savePhoto(imageData: photoData.imageData)
         }
     }
     
