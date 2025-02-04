@@ -8,18 +8,68 @@
 import SwiftUI
 
 struct ViewfinderView: View {
+    @ObservedObject var model = DataModel()
+    @Environment(\.dismiss) private var dismiss
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-            Text("bad")
+        ZStack {
+            // 相机预览
+            GeometryReader { geometry in
+                if let image = model.viewfinderImage {
+                    image
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: geometry.size.width-30, height: geometry.size.width-50)
+                        .clipped()
+                        .position(x: geometry.size.width/2, y: geometry.size.height/2)
+                } else {
+                    Color.gray
+                        .frame(width: geometry.size.width-10, height: geometry.size.width-10)
+                        .position(x: geometry.size.width/2, y: geometry.size.height/2)
+                }
+            }
+            
+            // 返回按钮
+            VStack {
+                HStack {
+                    Button(action: {
+                        dismiss()
+                    }) {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 20, weight: .semibold))
+                            .foregroundColor(.white)
+                            .padding()
+                            .background(Circle().fill(Color.black.opacity(0.5)))
+                            .padding(.leading, 20)
+                    }
+                    Spacer()
+                }
+                Spacer()
+            }
+            .padding(.top, 20)
+            
+            // 快门按钮
+            VStack {
+                Spacer()
+                Button(action: {
+                    model.camera.takePhoto()
+                }) {
+                    Circle()
+                        .stroke(Color.white, lineWidth: 3)
+                        .frame(width: 65, height: 65)
+                        .background(Circle().fill(Color.white.opacity(0.2)))
+                        .padding(.bottom, 30)
+                }
+            }
         }
-        .padding()
+        .background(Color.black)
+        .ignoresSafeArea()
+        .task {
+            await model.camera.start()
+        }
     }
 }
 
 #Preview {
-    ViewfinderView()
+    ViewfinderView(model: DataModel())
 }
