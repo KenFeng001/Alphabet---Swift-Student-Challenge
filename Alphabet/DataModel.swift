@@ -14,8 +14,8 @@ final class DataModel: ObservableObject {
     
     @Published var viewfinderImage: Image?
     @Published var thumbnailImage: Image?
-    @Published var capturedImageData: Data?
-    @Published var isPhotosLoaded = false
+    @Published var navigateToPreview = false
+
         
     init() {
         Task {
@@ -44,18 +44,29 @@ final class DataModel: ObservableObject {
         
         for await photoData in unpackedPhotoStream {
             Task { @MainActor in
-                isPhotosLoaded = true
-                logger.error("Photos loaded")
-                
+                thumbnailImage = photoData.thumbnailImage
+                navigateToPreview = true
             }
 //            savePhoto(imageData: photoData.imageData)
         }
     }
     
+//    func savePhoto(imageData: Data) {
+//        Task {
+//            do {
+//                try await photoCollection.addImage(imageData)
+//                logger.debug("Added image data to photo collection.")
+//            } catch let error {
+//                logger.error("Failed to add image to photo collection: \(error.localizedDescription)")
+//            }
+//        }
+//    }
+    
+    
     private func unpackPhoto(_ photo: AVCapturePhoto) -> PhotoData? {
         guard let imageData = photo.fileDataRepresentation() else { return nil }
 
-        guard let previewCGImage = photo.previewCGImageRepresentation(),
+        guard let previewCGImage = photo.cgImageRepresentation(),
            let metadataOrientation = photo.metadata[String(kCGImagePropertyOrientation)] as? UInt32,
               let cgImageOrientation = CGImagePropertyOrientation(rawValue: metadataOrientation) else { return nil }
         let imageOrientation = Image.Orientation(cgImageOrientation)

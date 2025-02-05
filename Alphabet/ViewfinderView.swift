@@ -9,7 +9,6 @@ import SwiftUI
 struct ViewfinderView: View {
     @StateObject var model = DataModel()
     @Environment(\.dismiss) private var dismiss
-    @State private var navigateToPreview = false
     
     var body: some View {
         NavigationStack {
@@ -54,8 +53,10 @@ struct ViewfinderView: View {
                 VStack {
                     Spacer()
                     Button(action: {
-                        model.camera.takePhoto()
-                        navigateToPreview = true
+                        Task { @MainActor in // 确保在主线程上执行
+                            model.camera.takePhoto()
+                            
+                        }
                     }) {
                         Circle()
                             .stroke(Color.white, lineWidth: 3)
@@ -64,7 +65,7 @@ struct ViewfinderView: View {
                             .padding(.bottom, 30)
                     }
                     .background(
-                        NavigationLink(destination: ViewfinderImagePreview(imageData: model.capturedImageData ?? Data()), isActive: $navigateToPreview) {
+                        NavigationLink(destination: ViewfinderImagePreview(image: model.thumbnailImage ?? Image(systemName: "photo")), isActive: $model.navigateToPreview) {
                             EmptyView()
                         }
                     )
@@ -80,6 +81,6 @@ struct ViewfinderView: View {
 }
 
 #Preview {
-    ViewfinderView(model: DataModel())
+    ViewfinderView()
 }
 
