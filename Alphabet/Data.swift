@@ -9,7 +9,7 @@ class PhotoItem {
     var letter: String
     var imageData: Data
     var timestamp: Date
-    var collection: PhotoCollection? // 关联到所属的系列
+    var collection: PhotoCollection?
     
     init(letter: String, imageData: Data, collection: PhotoCollection? = nil) {
         self.id = UUID()

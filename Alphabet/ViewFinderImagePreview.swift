@@ -1,20 +1,33 @@
 import SwiftUI
+import SwiftData
 
 struct ViewfinderImagePreview: View {
     @Environment(\.dismiss) private var dismiss // 用于返回的环境变量
-    var image: Image // 接收 Image 类型的数据
+    @Environment(\.modelContext) private var modelContext
+    var thumbNailImage: Image
+    var imageData: Data // 接收 Image 类型的数据
+    var selectedLetter: String // 接收字母数据
     
     var body: some View {
         ZStack {
             Color.black // 背景颜色
             
             GeometryReader { geometry in
-                image
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: geometry.size.width - 10, height: geometry.size.width - 10)
-                    .cornerRadius(10)
-                    .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
+                VStack {
+                    // 显示选中的字母
+                    Text(selectedLetter)
+                        .font(.system(size: 60))
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                        .padding(.top, 60)
+                    
+                    thumbNailImage
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: geometry.size.width - 10, height: geometry.size.width - 10)
+                        .cornerRadius(10)
+                        .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
+                }
             }
             
             // 自定义返回按钮
@@ -52,15 +65,38 @@ struct ViewfinderImagePreview: View {
         .navigationBarHidden(true) // 隐藏导航栏
         .ignoresSafeArea() // 忽略安全区域
     }
-    
+
     // 保存图像的函数
     private func saveImage() {
-        // 这里可以实现保存图像的逻辑
-        // 例如，将图像保存到相册或文件系统
-        print("Image saved!") // 仅为示例，实际保存逻辑需要实现
+        let photoItem = PhotoItem(letter: selectedLetter, imageData: imageData)
+        modelContext.insert(photoItem)
+        print("Saving image with letter: \(selectedLetter)")
     }
 }
 
+// 添加 Image 扩展来支持转换为 UIImage
+extension Image {
+    func asUIImage() -> UIImage? {
+        let controller = UIHostingController(rootView: self)
+        let view = controller.view
+        
+        let targetSize = controller.view.intrinsicContentSize
+        view?.bounds = CGRect(origin: .zero, size: targetSize)
+        view?.backgroundColor = .clear
+
+        let renderer = UIGraphicsImageRenderer(size: targetSize)
+
+        return renderer.image { _ in
+            view?.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
+        }
+    }
+}
+
+// 添加预览
 #Preview {
-    ViewfinderImagePreview(image: Image(systemName: "photo"))
+    ViewfinderImagePreview(
+        thumbNailImage: Image("IMG_5719"),
+        imageData: Data(), // 使用空的 Data 作为预览
+        selectedLetter: "A"
+    )
 }

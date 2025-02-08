@@ -14,6 +14,7 @@ final class DataModel: ObservableObject {
     
     @Published var viewfinderImage: Image?
     @Published var thumbnailImage: Image?
+    @Published var imageData: Data = Data()
     @Published var navigateToPreview = false
 
         
@@ -46,6 +47,7 @@ final class DataModel: ObservableObject {
             Task { @MainActor in
                 thumbnailImage = photoData.thumbnailImage
                 navigateToPreview = true
+                imageData = photoData.imageData
             }
 //            savePhoto(imageData: photoData.imageData)
         }

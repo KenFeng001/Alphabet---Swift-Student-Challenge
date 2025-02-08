@@ -9,9 +9,8 @@ import SwiftUI
 struct ViewfinderView: View {
     @StateObject var model = DataModel()
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
     @State private var selectedLetter: String = "A"
-    
-    let letters = Array("ABCDEFGHIJKLMNOPQRSTUVWXYZ").map(String.init)
     
     var body: some View {
         NavigationStack {
@@ -56,47 +55,10 @@ struct ViewfinderView: View {
                     Spacer()
                     
                     // 字母选择器
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 20) {
-                            ForEach(letters, id: \.self) { letter in
-                                Button(action: {
-                                    selectedLetter = letter
-                                }) {
-                                    Text(letter)
-                                        .font(.title2)
-                                        .fontWeight(.bold)
-                                        .foregroundColor(selectedLetter == letter ? .white : .gray)
-                                        .frame(width: 40, height: 40)
-                                        .background(
-                                            Circle()
-                                                .fill(selectedLetter == letter ? Color.blue : Color.white.opacity(0.2))
-                                        )
-                                }
-                            }
-                        }
-                        .padding(.horizontal)
-                    }
-                    .frame(height: 60)
-                    .background(Color.black.opacity(0.5))
+                    letterSelector
                     
                     // 快门按钮
-                    Button(action: {
-                        Task { @MainActor in
-                            model.camera.takePhoto()
-                        }
-                    }) {
-                        Circle()
-                            .stroke(Color.white, lineWidth: 3)
-                            .frame(width: 65, height: 65)
-                            .background(Circle().fill(Color.white.opacity(0.2)))
-                            .padding(.bottom, 30)
-                            .padding(.top, 10)
-                    }
-                    .background(
-                        NavigationLink(destination: ViewfinderImagePreview(image: model.thumbnailImage ?? Image(systemName: "photo")), isActive: $model.navigateToPreview) {
-                            EmptyView()
-                        }
-                    )
+                    shutterButton
                 }
             }
             .background(Color.black)
@@ -104,6 +66,69 @@ struct ViewfinderView: View {
             .task {
                 await model.camera.start()
             }
+        }
+        .navigationBarHidden(true)
+    }
+    
+    // 抽取字母选择器为单独的视图
+    private var letterSelector: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 20) {
+                ForEach(Array("ABCDEFGHIJKLMNOPQRSTUVWXYZ").map(String.init), id: \.self) { letter in
+                    letterButton(letter)
+                }
+            }
+            .padding(.horizontal)
+        }
+        .frame(height: 60)
+        .background(Color.black.opacity(0.5))
+    }
+    
+    // 抽取字母按钮为单独的视图
+    private func letterButton(_ letter: String) -> some View {
+        Button(action: {
+            selectedLetter = letter
+        }) {
+            Text(letter)
+                .font(.title2)
+                .fontWeight(.bold)
+                .foregroundColor(selectedLetter == letter ? .white : .gray)
+                .frame(width: 40, height: 40)
+                .background(
+                    Circle()
+                        .fill(selectedLetter == letter ? Color.blue : Color.white.opacity(0.2))
+                )
+        }
+    }
+    
+    // 抽取快门按钮和导航链接为单独的视图
+    private var shutterButton: some View {
+        Button(action: {
+            Task { @MainActor in
+                model.camera.takePhoto()
+            }
+        }) {
+            Circle()
+                .stroke(Color.white, lineWidth: 3)
+                .frame(width: 65, height: 65)
+                .background(Circle().fill(Color.white.opacity(0.2)))
+                .padding(.bottom, 30)
+                .padding(.top, 10)
+        }
+        .background(navigationLink)
+    }
+    
+    // 抽取导航链接为单独的视图
+    private var navigationLink: some View {
+        NavigationLink(
+            destination: ViewfinderImagePreview(
+                thumbNailImage: model.thumbnailImage ?? Image("IMG_5719"),
+                imageData: model.imageData,
+                selectedLetter: selectedLetter
+            ),
+            isActive: $model.navigateToPreview
+        ) {
+            EmptyView()
         }
     }
 }

@@ -16,14 +16,14 @@ struct AlphabetApp: App {
         do {
             container = try ModelContainer(for: PhotoItem.self, PhotoCollection.self)
         } catch {
-            fatalError("Failed to initialize ModelContainer: \(error)")
+            fatalError("Failed to initialize ModelContainer")
         }
     }
 
     var body: some Scene {
         WindowGroup {
-            ViewfinderView()
-        }
+            ContentView()
+         }
         .modelContainer(container)
 
     }
