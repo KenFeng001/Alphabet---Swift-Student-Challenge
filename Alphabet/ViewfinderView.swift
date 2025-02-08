@@ -9,6 +9,9 @@ import SwiftUI
 struct ViewfinderView: View {
     @StateObject var model = DataModel()
     @Environment(\.dismiss) private var dismiss
+    @State private var selectedLetter: String = "A"
+    
+    let letters = Array("ABCDEFGHIJKLMNOPQRSTUVWXYZ").map(String.init)
     
     var body: some View {
         NavigationStack {
@@ -49,13 +52,37 @@ struct ViewfinderView: View {
                 }
                 .padding(.top, 20)
                 
-                // 快门按钮
                 VStack {
                     Spacer()
+                    
+                    // 字母选择器
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 20) {
+                            ForEach(letters, id: \.self) { letter in
+                                Button(action: {
+                                    selectedLetter = letter
+                                }) {
+                                    Text(letter)
+                                        .font(.title2)
+                                        .fontWeight(.bold)
+                                        .foregroundColor(selectedLetter == letter ? .white : .gray)
+                                        .frame(width: 40, height: 40)
+                                        .background(
+                                            Circle()
+                                                .fill(selectedLetter == letter ? Color.blue : Color.white.opacity(0.2))
+                                        )
+                                }
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
+                    .frame(height: 60)
+                    .background(Color.black.opacity(0.5))
+                    
+                    // 快门按钮
                     Button(action: {
-                        Task { @MainActor in // 确保在主线程上执行
+                        Task { @MainActor in
                             model.camera.takePhoto()
-                            
                         }
                     }) {
                         Circle()
@@ -63,6 +90,7 @@ struct ViewfinderView: View {
                             .frame(width: 65, height: 65)
                             .background(Circle().fill(Color.white.opacity(0.2)))
                             .padding(.bottom, 30)
+                            .padding(.top, 10)
                     }
                     .background(
                         NavigationLink(destination: ViewfinderImagePreview(image: model.thumbnailImage ?? Image(systemName: "photo")), isActive: $model.navigateToPreview) {

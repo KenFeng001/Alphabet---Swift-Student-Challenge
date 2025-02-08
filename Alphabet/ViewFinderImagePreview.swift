@@ -32,11 +32,32 @@ struct ViewfinderImagePreview: View {
                     Spacer()
                 }
                 Spacer()
+                
+                // 添加保存按钮
+                Button(action: {
+                    saveImage() // 调用保存图像的函数
+                    dismiss()
+                }) {
+                    Text("Save")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .padding()
+                        .background(Color.blue)
+                        .cornerRadius(10)
+                }
+                .padding(.bottom, 30) // 添加底部间距
             }
             .padding(.top, 40) // 调整顶部间距
         }
         .navigationBarHidden(true) // 隐藏导航栏
         .ignoresSafeArea() // 忽略安全区域
+    }
+    
+    // 保存图像的函数
+    private func saveImage() {
+        // 这里可以实现保存图像的逻辑
+        // 例如，将图像保存到相册或文件系统
+        print("Image saved!") // 仅为示例，实际保存逻辑需要实现
     }
 }
 
