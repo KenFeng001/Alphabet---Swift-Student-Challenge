@@ -8,47 +8,105 @@ import SwiftUI
 import SwiftData
 
 struct Current_challenge: View {
-    @Query private var photoItems: [PhotoItem]
+    @Query private var photoCollections: [PhotoCollection]
+    @State private var showingCreateCollection = false
+    @State private var selectedCollectionId: UUID? // 新增：跟踪当前选中的collection
+    
+    // 获取当前选中的collection
+    private var currentCollection: PhotoCollection? {
+        photoCollections.first { $0.id == selectedCollectionId } ?? photoCollections.first
+    }
+    
+    // 获取当前collection的照片
+    private var currentPhotos: [PhotoItem] {
+        currentCollection?.photos ?? []
+    }
     
     var body: some View {
         ScrollView {
-            // 主标题和相机按钮
-            HStack {
-                Text("Collection")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .padding()
-                Spacer()
-                
-                // 添加相机按钮
-                NavigationLink(destination: ViewfinderView()) {
-                    Image(systemName: "camera.fill")
-                        .font(.title2)
-                        .foregroundColor(.blue)
+            if photoCollections.isEmpty {
+                // 当没有 collection 时显示的视图
+                VStack {
+                    Text("No Collections")
+                        .font(.title)
                         .padding()
-                        .background(Circle().fill(Color.blue.opacity(0.2)))
+                    
+                    Button(action: {
+                        showingCreateCollection = true
+                    }) {
+                        Text("Create New Collection")
+                            .padding()
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }
                 }
-                .padding(.trailing)
-            }
-            .padding(.leading)
-            
-            // 二级标题和进度条
-            HStack {
-                Text("Progress")
-                    .font(.headline)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding()
+            } else {
+                HStack {
+                    Menu {
+                        ForEach(photoCollections, id: \.id) { collection in
+                            Button(action: {
+                                selectedCollectionId = collection.id
+                            }) {
+                                Text(collection.name)
+                            }
+                        }
+                        Button(action: {
+                            showingCreateCollection = true
+                        }) {
+                            Text("Create New Collection")
+                        }
+                    } label: {
+                        Text(currentCollection?.name ?? "Select Collection")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .padding()
+                    }
+                    
+                    Spacer()
+                    
+                    // 修改相机按钮，传入当前collection
+                    NavigationLink(destination: ViewfinderView(currentCollection: currentCollection)) {
+                        Image(systemName: "camera.fill")
+                            .font(.title2)
+                            .foregroundColor(.blue)
+                            .padding()
+                            .background(Circle().fill(Color.blue.opacity(0.2)))
+                    }
                     .padding(.trailing)
+                }
+                .padding(.leading)
                 
-                ProgressView(value: 1, total: 26) // 进度条，设置为50%
-                    .progressViewStyle(LinearProgressViewStyle())
-                    .frame(width: 200) // 设置进度条宽度
+                // 使用当前collection的进度
+                HStack {
+                    Text("Progress")
+                        .font(.headline)
+                        .padding(.trailing)
+                    
+                    ProgressView(value: currentCollection?.progress ?? 0, total: 1)
+                        .progressViewStyle(LinearProgressViewStyle())
+                        .frame(width: 200)
+                }
+                .padding(.leading)
+                
+                // 传入当前collection的照片
+                SlidingCards(photoItems: currentPhotos)
+                    .frame(height: 550)
+                
+                // 传入当前collection的照片
+                LetterGrid(photoItems: currentPhotos)
             }
-            .padding(.leading)
-            
-            SlidingCards(photoItems: photoItems)
-                .frame(height: 550) // 给 SlidingCards 一个固定高度
-            
-            // 添加字母网格
-            LetterGrid(photoItems: photoItems)
+        }
+        .sheet(isPresented: $showingCreateCollection) {
+            CreateCollectionView()
+        }
+        .onChange(of: photoCollections) { oldValue, newValue in
+            // 如果是第一次加载collections，自动选择第一个
+            if selectedCollectionId == nil && !newValue.isEmpty {
+                selectedCollectionId = newValue.first?.id
+            }
         }
     }
 }
@@ -153,5 +211,47 @@ struct SmallCard: View {
             .cornerRadius(10)
         }
     }
+}
+
+// 创建新集合的视图
+struct CreateCollectionView: View {
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
+    @State private var collectionName: String = ""
+    @State private var isTimeLimited: Bool = false // 控制时间限制的状态
+    @State private var endDate: Date = Date() // 默认结束时间为当前时间
+
+    var body: some View {
+        NavigationView {
+            Form {
+                Section(header: Text("Collection Name")) {
+                    TextField("Enter collection name", text: $collectionName)
+                }
+                
+                Section {
+                    Toggle("Time Limited", isOn: $isTimeLimited)
+                    
+                    if isTimeLimited {
+                        DatePicker("End Date", selection: $endDate, displayedComponents: .date)
+                    }
+                }
+                
+                Button("Create") {
+                    let tempCollection = PhotoCollection(name: collectionName, expectedEndDate: endDate)
+                    modelContext.insert(tempCollection)
+                    print("new collection has created")
+                    dismiss()
+                }
+            }
+            .navigationTitle("New Collection")
+            .navigationBarItems(trailing: Button("Cancel") {
+                dismiss()
+            })
+        }
+    }
+}
+
+#Preview {
+    Current_challenge()
 }
 

@@ -11,6 +11,7 @@ struct ViewfinderView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     @State private var selectedLetter: String = "A"
+    var currentCollection: PhotoCollection?
     
     var body: some View {
         NavigationStack {
@@ -124,7 +125,8 @@ struct ViewfinderView: View {
             destination: ViewfinderImagePreview(
                 thumbNailImage: model.thumbnailImage ?? Image("IMG_5719"),
                 imageData: model.imageData,
-                selectedLetter: selectedLetter
+                selectedLetter: selectedLetter,
+                currentCollection: currentCollection
             ),
             isActive: $model.navigateToPreview
         ) {

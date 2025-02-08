@@ -7,6 +7,7 @@ struct ViewfinderImagePreview: View {
     var thumbNailImage: Image
     var imageData: Data // 接收 Image 类型的数据
     var selectedLetter: String // 接收字母数据
+    var currentCollection: PhotoCollection? // 新增参数
     
     var body: some View {
         ZStack {
@@ -68,9 +69,13 @@ struct ViewfinderImagePreview: View {
 
     // 保存图像的函数
     private func saveImage() {
-        let photoItem = PhotoItem(letter: selectedLetter, imageData: imageData)
+        let photoItem = PhotoItem(
+            letter: selectedLetter, 
+            imageData: imageData,
+            collection: currentCollection // 设置照片所属的collection
+        )
         modelContext.insert(photoItem)
-        print("Saving image with letter: \(selectedLetter)")
+        print("Saving image with letter: \(selectedLetter) to collection: \(currentCollection?.name ?? "none")")
     }
 }
 
@@ -97,6 +102,7 @@ extension Image {
     ViewfinderImagePreview(
         thumbNailImage: Image("IMG_5719"),
         imageData: Data(), // 使用空的 Data 作为预览
-        selectedLetter: "A"
+        selectedLetter: "A",
+        currentCollection: nil
     )
 }

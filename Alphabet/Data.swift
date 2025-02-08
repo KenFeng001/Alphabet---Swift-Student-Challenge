@@ -24,17 +24,15 @@ class PhotoItem {
 class PhotoCollection {
     var id: UUID
     var name: String
-    var info: String
     @Relationship(deleteRule: .cascade) var photos: [PhotoItem]
     @Relationship(inverse: \PhotoItem.collection)
     var createdAt: Date
     var expectedEndDate: Date
     var isCompleted: Bool
     
-    init(name: String, description: String, expectedEndDate: Date) {
+    init(name: String, expectedEndDate: Date) {
         self.id = UUID()
         self.name = name
-        self.info = description
         self.photos = []
         self.createdAt = Date()
         self.expectedEndDate = expectedEndDate

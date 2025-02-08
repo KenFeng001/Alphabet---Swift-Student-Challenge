@@ -15,6 +15,11 @@ struct AlphabetApp: App {
     init() {
         do {
             container = try ModelContainer(for: PhotoItem.self, PhotoCollection.self)
+            // 只在首次启动时检查并创建 Starter Collection
+            if !UserDefaults.standard.bool(forKey: "hasLaunchedBefore") {
+                createStarterCollectionIfNeeded()
+                UserDefaults.standard.set(true, forKey: "hasLaunchedBefore")
+            }
         } catch {
             fatalError("Failed to initialize ModelContainer")
         }
@@ -26,5 +31,24 @@ struct AlphabetApp: App {
          }
         .modelContainer(container)
 
+    }
+    
+    private func createStarterCollectionIfNeeded() {
+        Task { @MainActor in
+            let context = container.mainContext
+            // 检查是否存在任何 Collection
+            let descriptor = FetchDescriptor<PhotoCollection>()
+            let existingCollections = try? context.fetch(descriptor)
+            
+            // 只在没有任何 collection 时创建 Starter Collection
+            if existingCollections?.isEmpty ?? true {
+                let starterCollection = PhotoCollection(
+                    name: "Starter Collection",
+                    expectedEndDate: Date().addingTimeInterval(30 * 24 * 60 * 60)
+                )
+                context.insert(starterCollection)
+                try? context.save()
+            }
+        }
     }
 }
