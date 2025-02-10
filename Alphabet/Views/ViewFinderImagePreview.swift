@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import Photos // 添加 Photos 框架
 
 struct ViewfinderImagePreview: View {
     @Environment(\.dismiss) private var dismiss // 用于返回的环境变量
@@ -67,15 +68,32 @@ struct ViewfinderImagePreview: View {
         .ignoresSafeArea() // 忽略安全区域
     }
 
-    // 保存图像的函数
+    // 修改保存图像的函数
     private func saveImage() {
+        // 保存到 SwiftData
         let photoItem = PhotoItem(
             letter: selectedLetter, 
             imageData: imageData,
-            collection: currentCollection // 设置照片所属的collection
+            collection: currentCollection
         )
         modelContext.insert(photoItem)
-        print("Saving image with letter: \(selectedLetter) to collection: \(currentCollection?.name ?? "none")")
+        
+        // 保存到相册
+        PHPhotoLibrary.requestAuthorization { status in
+            guard status == .authorized else { return }
+            
+            PHPhotoLibrary.shared().performChanges {
+                // 创建相册请求
+                let createAssetRequest = PHAssetCreationRequest.forAsset()
+                createAssetRequest.addResource(with: .photo, data: imageData, options: nil)
+            } completionHandler: { success, error in
+                if success {
+                    print("Successfully saved to photo library")
+                } else if let error = error {
+                    print("Error saving to photo library: \(error.localizedDescription)")
+                }
+            }
+        }
     }
 }
 
