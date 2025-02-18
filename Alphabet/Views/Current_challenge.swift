@@ -194,7 +194,6 @@ struct SmallCard: View {
     let letter: String
     var photoItems: [PhotoItem]
     @State private var showPhotoPicker = false
-    @State private var showPhotoGallery = false // 新增：控制照片集查看
     @Environment(\.modelContext) private var modelContext
 
     // 获取当前 collection
@@ -209,7 +208,7 @@ struct SmallCard: View {
                 .sorted(by: { $0.timestamp > $1.timestamp })
                 .first,
                let uiImage = UIImage(data: latestItem.imageData) {
-                // 有照片的情况
+                // 有最新照片的情况
                 Image(uiImage: uiImage)
                     .resizable()
                     .scaledToFill()
@@ -217,9 +216,6 @@ struct SmallCard: View {
                     .clipped()
                     .background(Color.gray)
                     .cornerRadius(10)
-                    .onTapGesture {
-                        showPhotoGallery = true
-                    }
                     .contextMenu {
                         Button(action: {
                             showPhotoPicker = true
@@ -230,9 +226,6 @@ struct SmallCard: View {
                         NavigationLink(destination: ViewfinderView(selectedLetter: letter, currentCollection: currentCollection)) {
                             Label("拍摄新照片", systemImage: "camera.fill")
                         }
-                    }
-                    .sheet(isPresented: $showPhotoGallery) {
-                        PhotoGalleryView(photos: letterPhotos, letter: letter)
                     }
             } else {
                 // 没有照片的情况
@@ -320,16 +313,6 @@ struct CreateCollectionView: View {
         }
     }
 }
-
-struct PhotoGalleryView: View {
-    var photos: [PhotoItem]
-    var letter: String
-    @Environment(\.modelContext) private var modelContext
-
-    
-    var body: some View {
-        Text("Photo Gallery for \(letter)")
-
 
 #Preview {
     Current_challenge()
