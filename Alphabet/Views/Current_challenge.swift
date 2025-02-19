@@ -46,51 +46,42 @@ struct Current_challenge: View {
                 .padding()
             } else {
                 HStack {
-                    Menu {
-                        ForEach(photoCollections, id: \.id) { collection in
-                            Button(action: {
-                                selectedCollectionId = collection.id
-                            }) {
-                                Text(collection.name)
-                            }
+
+                    Button(action: {
+                        // 处理 Collection 按钮的点击事件
+                    }) {
+                        HStack {
+                            Image(systemName: "photo.on.rectangle")
+                                .foregroundColor(.gray)
+                            Text("Collection")
+                                .foregroundColor(.gray)
                         }
-                        Button(action: {
-                            showingCreateCollection = true
-                        }) {
-                            Text("Create New Collection")
-                        }
-                    } label: {
-                        Text(currentCollection?.name ?? "Select Collection")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                            .padding()
                     }
-                    
-                    Spacer()
-                    
-                    // 修改相机按钮，传入当前collection
-                    NavigationLink(destination: ViewfinderView(selectedLetter: "A", currentCollection: currentCollection)) {
-                        Image(systemName: "camera.fill")
-                            .font(.title2)
-                            .foregroundColor(.blue)
-                            .padding()
-                            .background(Circle().fill(Color.blue.opacity(0.2)))
+                
+                // 右侧的图标
+                Button(action: {
+                    // 处理 Finding 按钮的点击事件
+                }) {
+                    HStack {
+                        Image(systemName: "magnifyingglass")
+                            .foregroundColor(.gray)
+                        Text("Finding")
+                            .foregroundColor(.gray) 
                     }
-                    .padding(.trailing)
+                    }
+                Spacer()
                 }
-                .padding(.leading)
+                .padding(.leading, 20)
+
                 
                 // 使用当前collection的进度
                 HStack {
-                    Text("Progress")
-                        .font(.headline)
-                        .padding(.trailing)
-                    
-                    ProgressView(value: currentCollection?.progress ?? 0, total: 1)
-                        .progressViewStyle(LinearProgressViewStyle())
-                        .frame(width: 200)
+                    HeadLine()
+                    Spacer()
+                    ProgressBar(currentCollection: currentCollection)
                 }
                 .padding(.leading)
+                .padding(.top, 38)
                 
                 // 传入当前collection的照片
                 SlidingCards(photoItems: currentPhotos)
@@ -111,47 +102,169 @@ struct Current_challenge: View {
         }
     }
 }
+
+struct HeadLine: View {
+    @State private var showLocationPicker = false
+    @State private var selectedLocation = "The tube"
     
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 4) {
+                Image(systemName: "magnifyingglass")
+                    .font(.system(size: 20))
+                    .foregroundColor(.gray)
+                Text("Finding alphabet in")
+                    .foregroundColor(.gray)
+                    .font(.system(size: 16))
+            }
+            
+            Menu {
+                Button("The tube") {
+                    selectedLocation = "The tube"
+                }
+                Button("Street") {
+                    selectedLocation = "Street"
+                }
+                // 添加更多选项
+            } label: {
+                HStack {
+                    Text(selectedLocation)
+                        .font(.system(size: 32, weight: .bold))
+                        .foregroundColor(.black)
+                    Image(systemName: "chevron.down")
+                        .font(.system(size: 20))
+                }
+            }
+        }
+    }
+}
+
+struct ProgressBar: View {
+    var currentCollection: PhotoCollection?
     
+    private var progress: Double {
+        currentCollection?.progress ?? 0
+    }
+    
+    private var progressText: String {
+        let collectedCount = currentCollection?.collectedLetters.count ?? 0
+        return "\(collectedCount)/26"
+    }
+    
+    var body: some View {
+        VStack(alignment: .trailing, spacing: 4) {
+            // 进度文本
+            Text(progressText)
+                .font(.system(size: 16))
+                .foregroundColor(.gray)
+            
+            // 进度条
+            ProgressView(value: progress)
+                .tint(.black)       // 设置进度条颜色
+                .background(Color.gray.opacity(0.2))  // 设置背景色
+                .frame(width: 100, height: 4)   // 设置固定宽度和高度
+                .clipShape(Rectangle())  // 设置形状
+        }
+        .padding(.horizontal)
+    }
+}
+
 struct Card: View {
     var title: String
     var description: String
     var photoItems: [PhotoItem]
-
+    @State private var isLetterVisible = false // 控制字母显示的状态
+    @State private var isBackdropVisible = false // 控制背景显示的状态
+    @State private var isTextVisible = false // 控制文字显示的状态
+    
     var body: some View {
         if let latestItem = photoItems
             .filter({ $0.letter == title })
             .sorted(by: { $0.timestamp > $1.timestamp })
             .first,
            let uiImage = UIImage(data: latestItem.imageData) {
-            // 有最新照片的情况
-            Image(uiImage: uiImage)
-                .resizable()
-                .scaledToFill()
-                .frame(width: 337, height: 449)
-                .clipped()
-                .background(Color.gray)
-                .cornerRadius(20)
-                .shadow(radius: 10)
-        } else {
-            VStack {
-                Text(title)
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .padding()
-                Text(description)
-                    .font(.body)
-                    .padding()
+            // 有照片的情况保持不变
+            ZStack {
+                Image("cardbackground")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 337, height: 449)
+                
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 337, height: 449)
             }
-            .frame(width: 337, height: 449)
-            .background(Color.gray)
+            .clipped()
             .cornerRadius(20)
             .shadow(radius: 10)
+        } else {
+            // 没有照片的情况
+            ZStack {
+                Image("cardbackground")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 337, height: 449)
+                
+                VStack(spacing: 20) {
+                    Text("Looking for")
+                        .font(.system(size: 32))
+                        .opacity(isTextVisible ? 1 : 0)
+                        .scaleEffect(isTextVisible ? 1 : 0.8)
+                    
+                    ZStack {
+                        Image("letterbackdrop")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 200)
+                            .scaleEffect(isBackdropVisible ? 1 : 0.5)
+                            .opacity(isBackdropVisible ? 1 : 0)
+                        
+                        Text(title)
+                            .font(.system(size: 100, weight: .bold))
+                            .foregroundColor(.black)
+                            .scaleEffect(isLetterVisible ? 1 : 0.5)
+                            .opacity(isLetterVisible ? 1 : 0)
+                    }
+                    
+                    Text("Sometimes you have to look at the world differently to see the possibilities.")
+                        .font(.body)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 40)
+                        .opacity(isTextVisible ? 1 : 0)
+                        .scaleEffect(isTextVisible ? 1 : 0.8)
+                }
+            }
+            .frame(width: 337, height: 449)
+            .clipped()
+            .cornerRadius(20)
+            .shadow(radius: 10)
+            .onAppear {
+                // 背景动画
+                withAnimation(.easeOut(duration: 0.6)) {
+                    isBackdropVisible = true
+                }
+                
+                // 字母动画
+                withAnimation(.easeOut(duration: 0.4).delay(0.3)) {
+                    isLetterVisible = true
+                }
+                
+                // 文字动画
+                withAnimation(.easeOut(duration: 0.4).delay(0.5)) {
+                    isTextVisible = true
+                }
+            }
+            .onDisappear {
+                // 重置所有状态
+                isBackdropVisible = false
+                isLetterVisible = false
+                isTextVisible = false
+            }
         }
     }
 }
 
-        
 struct SlidingCards: View {
     let letters = Array("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
     var photoItems: [PhotoItem]  // 通过属性传递
@@ -188,7 +301,6 @@ struct LetterGrid: View {
         .padding()
     }
 }
-
 
 struct SmallCard: View {
     let letter: String
@@ -274,7 +386,6 @@ struct SmallCard: View {
         }
     }
 }
-
 
 // 创建新集合的视图
 struct CreateCollectionView: View {
