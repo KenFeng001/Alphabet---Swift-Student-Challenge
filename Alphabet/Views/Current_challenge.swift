@@ -306,18 +306,24 @@ struct SlidingCards: View {
     
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 20) {
+            HStack(spacing: 0) {
                 ForEach(letters.indices, id: \.self) { index in
                     Card(
                         title: String(letters[index]),
                         description: "This is the letter \(letters[index]).",
                         photoItems: photoItems
                     )
-                    .frame(width: UIScreen.main.bounds.width - 80)  // 设置卡片宽度，让两边能看到其他卡片
+                    .scrollTransition(.animated) { content, phase in
+                        content
+                            .opacity(phase.isIdentity ? 1 : 0.5)
+                            .scaleEffect(phase.isIdentity ? 1 : 0.9)
+                    }
                 }
             }
-            .padding(.horizontal, 40)  // 添加水平内边距
+            .scrollTargetLayout()
+            .padding(.horizontal, 30)
         }
+        .scrollTargetBehavior(.viewAligned)
     }
 }
     
