@@ -45,35 +45,10 @@ struct Current_challenge: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding()
             } else {
-                HStack {
-
-                    Button(action: {
-                        // 处理 Collection 按钮的点击事件
-                    }) {
-                        HStack {
-                            Image(systemName: "photo.on.rectangle")
-                                .foregroundColor(.gray)
-                            Text("Collection")
-                                .foregroundColor(.gray)
-                        }
-                    }
+                VStack(spacing: 38){
+                Navigation()
                 
-                // 右侧的图标
-                Button(action: {
-                    // 处理 Finding 按钮的点击事件
-                }) {
-                    HStack {
-                        Image(systemName: "magnifyingglass")
-                            .foregroundColor(.gray)
-                        Text("Finding")
-                            .foregroundColor(.gray) 
-                    }
-                    }
-                Spacer()
-                }
-                .padding(.leading, 20)
-
-                
+                VStack(spacing: 20){
                 // 使用当前collection的进度
                 HStack {
                     HeadLine()
@@ -81,14 +56,15 @@ struct Current_challenge: View {
                     ProgressBar(currentCollection: currentCollection)
                 }
                 .padding(.leading)
-                .padding(.top, 38)
                 
                 // 传入当前collection的照片
                 SlidingCards(photoItems: currentPhotos)
-                    .frame(height: 550)
+                    .frame(height: 461)
+                }
                 
                 // 传入当前collection的照片
                 LetterGrid(photoItems: currentPhotos)
+            }
             }
         }
         .sheet(isPresented: $showingCreateCollection) {
@@ -100,6 +76,37 @@ struct Current_challenge: View {
                 selectedCollectionId = newValue.first?.id
             }
         }
+    }
+}
+
+struct Navigation: View {
+    var body: some View {
+        HStack {
+            Button(action: {
+                // 处理 Collection 按钮的点击事件
+            }) {
+                HStack {
+                    Image(systemName: "photo.on.rectangle")
+                        .foregroundColor(.gray)
+                    Text("Collection")
+                        .foregroundColor(.gray)
+                }
+            }
+              
+            // 右侧的图标
+            Button(action: {
+                // 处理 Finding 按钮的点击事件
+            }) {
+                HStack {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundColor(.gray)
+                    Text("Finding")
+                        .foregroundColor(.gray)
+                }
+            }
+            Spacer()
+        }
+        .padding(.leading, 20)
     }
 }
 
@@ -173,9 +180,18 @@ struct Card: View {
     var title: String
     var description: String
     var photoItems: [PhotoItem]
-    @State private var isLetterVisible = false // 控制字母显示的状态
-    @State private var isBackdropVisible = false // 控制背景显示的状态
-    @State private var isTextVisible = false // 控制文字显示的状态
+    @State private var isLetterVisible = false
+    @State private var isBackdropVisible = false
+    @State private var isTextVisible = false
+    @State private var randomQuote: MotivationalQuote // 添加随机引用状态
+    
+    init(title: String, description: String, photoItems: [PhotoItem]) {
+        self.title = title
+        self.description = description
+        self.photoItems = photoItems
+        // 在初始化时选择随机引用
+        _randomQuote = State(initialValue: quotes.randomElement() ?? MotivationalQuote(quote: "Look at the world differently.", author: "Unknown"))
+    }
     
     var body: some View {
         if let latestItem = photoItems
@@ -185,11 +201,6 @@ struct Card: View {
            let uiImage = UIImage(data: latestItem.imageData) {
             // 有照片的情况保持不变
             ZStack {
-                Image("cardbackground")
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 337, height: 449)
-                
                 Image(uiImage: uiImage)
                     .resizable()
                     .scaledToFill()
@@ -206,11 +217,12 @@ struct Card: View {
                     .scaledToFill()
                     .frame(width: 337, height: 449)
                 
-                VStack(spacing: 20) {
-                    Text("Looking for")
-                        .font(.system(size: 32))
-                        .opacity(isTextVisible ? 1 : 0)
-                        .scaleEffect(isTextVisible ? 1 : 0.8)
+                VStack(spacing: 8) {
+                    VStack {
+                        Image(systemName: "eyes")
+                        Text("Looking for")
+                            .font(.system(size: 24))
+                    }
                     
                     ZStack {
                         Image("letterbackdrop")
@@ -227,18 +239,41 @@ struct Card: View {
                             .opacity(isLetterVisible ? 1 : 0)
                     }
                     
-                    Text("Sometimes you have to look at the world differently to see the possibilities.")
+                    Text(randomQuote.quote)
                         .font(.body)
                         .multilineTextAlignment(.center)
-                        .padding(.horizontal, 40)
+                        .padding(.horizontal, 14)
                         .opacity(isTextVisible ? 1 : 0)
                         .scaleEffect(isTextVisible ? 1 : 0.8)
+
+                    Text("- \(randomQuote.author)")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                        .padding(.top, 4)
+                        .opacity(isTextVisible ? 1 : 0)
+                        .scaleEffect(isTextVisible ? 1 : 0.8)
+
+                    HStack {
+                        Button(action: {
+                            // 处理按钮的点击事件
+                        }) {
+                            Image("takeimage")
+                        }
+                        Button(action: {
+                            // 处理按钮的点击事件
+                        }) {
+                            Image("import")
+                        }
+                    }
+                    .padding(.leading, 140)
+                    .padding(.top, 14)
+
                 }
             }
-            .frame(width: 337, height: 449)
+            .frame(width: 349, height: 461)
             .clipped()
             .cornerRadius(20)
-            .shadow(radius: 10)
+            // .shadow(radius: 10)
             .onAppear {
                 // 背景动画
                 withAnimation(.easeOut(duration: 0.6)) {
@@ -267,20 +302,22 @@ struct Card: View {
 
 struct SlidingCards: View {
     let letters = Array("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
-    var photoItems: [PhotoItem]  // 通过属性传递
+    var photoItems: [PhotoItem]
     
     var body: some View {
-        TabView {
-            ForEach(letters.indices, id: \.self) { index in
-                Card(
-                    title: String(letters[index]),
-                    description: "This is the letter \(letters[index]).",
-                    photoItems: photoItems
-                )
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 20) {
+                ForEach(letters.indices, id: \.self) { index in
+                    Card(
+                        title: String(letters[index]),
+                        description: "This is the letter \(letters[index]).",
+                        photoItems: photoItems
+                    )
+                    .frame(width: UIScreen.main.bounds.width - 80)  // 设置卡片宽度，让两边能看到其他卡片
+                }
             }
+            .padding(.horizontal, 40)  // 添加水平内边距
         }
-        .tabViewStyle(PageTabViewStyle())
-        .indexViewStyle(PageIndexViewStyle(backgroundDisplayMode: .always)) // 显示页码指示器
     }
 }
     
