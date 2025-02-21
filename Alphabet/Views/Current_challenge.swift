@@ -11,7 +11,7 @@ import PhotosUI
 struct Current_challenge: View {
     @Query private var photoCollections: [PhotoCollection]
     @State private var showingCreateCollection = false
-    @State private var selectedCollectionId: UUID?
+    @State private var selectedCollectionId: UUID? = SampleData.collection.id  // 设置默认的示例集合 ID
     @State private var scrollProgress: CGFloat = 0.0 // 添加滚动进度状态
     
     // 获取当前选中的collection
@@ -118,7 +118,7 @@ struct HeadLine: View {
     @Query private var photoCollections: [PhotoCollection]
     @Binding var selectedCollectionId: UUID?
     @State private var showingCreateCollection = false
-    var isScrolledPast: Bool // 添加滚动状态属性
+    var isScrolledPast: Bool
     
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -147,7 +147,7 @@ struct HeadLine: View {
                 }
             } label: {
                 HStack {
-                    Text(photoCollections.first(where: { $0.id == selectedCollectionId })?.name ?? "Select Collection")
+                    Text(photoCollections.first(where: { $0.id == selectedCollectionId })?.name ?? "示例集合")
                         .font(.system(size: 32, weight: .bold))
                         .foregroundColor(.black)
                     Image(systemName: "chevron.down")
@@ -366,6 +366,7 @@ struct SmallCard: View {
     let letter: String
     var photoItems: [PhotoItem]
     @State private var showPhotoPicker = false
+    @State private var showImagePreview = false // 新增状态
     @Environment(\.modelContext) private var modelContext
 
     var currentCollection: PhotoCollection? {
@@ -383,10 +384,13 @@ struct SmallCard: View {
                 Image(uiImage: uiImage)
                     .resizable()
                     .scaledToFill()
-                    .frame(width: 100, height: 100)
+                    .frame(width: 100, height: 132)
                     .clipped()
-                    .background(Color.gray) // 使用纯色背景
+                    .background(Color.gray)
                     .cornerRadius(10)
+                    .onTapGesture {
+                        showImagePreview = true // 点击时显示预览
+                    }
                     .contextMenu {
                         Button(action: {
                             showPhotoPicker = true
@@ -398,21 +402,33 @@ struct SmallCard: View {
                             Label("拍摄新照片", systemImage: "camera.fill")
                         }
                     }
+                    .sheet(isPresented: $showImagePreview) {
+                        ImagePreviewer(photos: photoItems.filter { $0.letter == letter }, selectedLetter: letter)
+                    }
             } else {
                 // 没有照片的情况
                 VStack {
-                    Image("smallcardbg") // 使用背景图片
+                    Image("smallcardbg")
                         .resizable()
                         .scaledToFill()
                         .frame(width: 100, height: 132)
                         .cornerRadius(10)
                     
-                    Text(letter.uppercased() + letter.lowercased()) // 显示小写字母
+                    Text(letter.uppercased() + letter.lowercased())
                         .fontWeight(.bold)
                         .font(.system(size: 14))
                         .padding(.top, 4)
-                        .padding(.leading, 5)
-                        .padding(.trailing, 58)
+                }
+                .contextMenu {
+                    Button(action: {
+                        showPhotoPicker = true
+                    }) {
+                        Label("上传照片", systemImage: "photo")
+                    }
+                    
+                    NavigationLink(destination: ViewfinderView(selectedLetter: letter, currentCollection: currentCollection)) {
+                        Label("拍摄照片", systemImage: "camera.fill")
+                    }
                 }
             }
         }

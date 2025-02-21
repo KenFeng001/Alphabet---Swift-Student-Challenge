@@ -10,13 +10,15 @@ class PhotoItem {
     var imageData: Data
     var timestamp: Date
     var collection: PhotoCollection?
+    var isPinned: Bool
     
-    init(letter: String, imageData: Data, collection: PhotoCollection? = nil) {
+    init(letter: String, imageData: Data, collection: PhotoCollection? = nil, isPinned: Bool = false) {
         self.id = UUID()
         self.letter = letter
         self.imageData = imageData
         self.timestamp = Date()
         self.collection = collection
+        self.isPinned = isPinned
     }
 }
 
@@ -68,5 +70,15 @@ class PhotoCollection {
         let allLetters = Array("ABCDEFGHIJKLMNOPQRSTUVWXYZ").map(String.init)
         let collectedSet = Set(collectedLetters)
         return allLetters.filter { !collectedSet.contains($0) }
+    }
+    
+    // 固定特定字母的 PhotoItem
+    func pinPhotoItem(for letter: String, photoItem: PhotoItem) {
+        // 先取消其他同字母的固定状态
+        for item in photos where item.letter == letter {
+            item.isPinned = false
+        }
+        // 设置当前 PhotoItem 为固定状态
+        photoItem.isPinned = true
     }
 }

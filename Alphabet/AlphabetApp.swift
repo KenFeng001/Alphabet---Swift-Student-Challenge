@@ -43,7 +43,7 @@ struct AlphabetApp: App {
             // 只在没有任何 collection 时创建 Starter Collection
             if existingCollections?.isEmpty ?? true {
                 let starterCollection = PhotoCollection(
-                    name: "Starter Collection",
+                    name: "Starter",
                     expectedEndDate: Date().addingTimeInterval(30 * 24 * 60 * 60)
                 )
                 context.insert(starterCollection)
