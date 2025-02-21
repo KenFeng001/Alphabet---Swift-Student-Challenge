@@ -62,4 +62,11 @@ class PhotoCollection {
     var latestPhoto: PhotoItem? {
         photos.sorted(by: { $0.timestamp > $1.timestamp }).first
     }
+    
+    // 获取未收集的字母集合，保持字母顺序
+    var uncollectedLetters: [String] {
+        let allLetters = Array("ABCDEFGHIJKLMNOPQRSTUVWXYZ").map(String.init)
+        let collectedSet = Set(collectedLetters)
+        return allLetters.filter { !collectedSet.contains($0) }
+    }
 }

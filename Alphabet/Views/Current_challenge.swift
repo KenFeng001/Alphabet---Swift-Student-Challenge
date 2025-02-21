@@ -11,7 +11,8 @@ import PhotosUI
 struct Current_challenge: View {
     @Query private var photoCollections: [PhotoCollection]
     @State private var showingCreateCollection = false
-    @State private var selectedCollectionId: UUID? // 新增：跟踪当前选中的collection
+    @State private var selectedCollectionId: UUID?
+    @State private var scrollProgress: CGFloat = 0.0 // 添加滚动进度状态
     
     // 获取当前选中的collection
     var currentCollection: PhotoCollection? {
@@ -22,50 +23,53 @@ struct Current_challenge: View {
     private var currentPhotos: [PhotoItem] {
         currentCollection?.photos ?? []
     }
+
+    private var uncollectedLetters: [String] {
+        currentCollection?.uncollectedLetters ?? []
+    }
     
     var body: some View {
-        ScrollView {
-            if photoCollections.isEmpty {
-                // 当没有 collection 时显示的视图
-                VStack {
-                    Text("No Collections")
-                        .font(.title)
-                        .padding()
-                    
-                    Button(action: {
-                        showingCreateCollection = true
-                    }) {
-                        Text("Create New Collection")
-                            .padding()
-                            .background(Color.blue)
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
-                    }
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .padding()
-            } else {
-                VStack(spacing: 38){
-                Navigation()
-                
-                VStack(spacing: 20){
-                // 使用当前collection的进度
+        VStack(spacing: 38) {
+            Navigation() // 固定在顶部
+            
+            VStack(spacing: 20) {
                 HStack {
-                    HeadLine()
+                    HeadLine(
+                        selectedCollectionId: $selectedCollectionId,
+                        isScrolledPast: scrollProgress > 0.3 // 传递滚动状态
+                    )
                     Spacer()
                     ProgressBar(currentCollection: currentCollection)
                 }
                 .padding(.leading)
-                
-                // 传入当前collection的照片
-                SlidingCards(photoItems: currentPhotos)
-                    .frame(height: 461)
+            }
+            
+            ScrollView {
+                SlidingCards(photoItems: currentPhotos, currentCollection: currentCollection, uncollectedLetters: uncollectedLetters)
+                        .frame(height: 461)
+                VStack {
+
+                    
+                    Divider()
+                        .padding(.vertical, 10)
+                    
+                    Image(systemName: "sparkle.magnifyingglass")
+                        .font(.title)
+                        .foregroundColor(.gray)
+                        .padding(.bottom, 10)
+                    
+                    LetterGrid(photoItems: currentPhotos)
                 }
-                
-                // 传入当前collection的照片
-                LetterGrid(photoItems: currentPhotos)
+                .background(GeometryReader { geo -> Color in
+                    DispatchQueue.main.async {
+                        let offset = -geo.frame(in: .named("scroll")).origin.y
+                        let contentHeight = geo.size.height - UIScreen.main.bounds.height
+                        scrollProgress = contentHeight > 0 ? offset / contentHeight : 0
+                    }
+                    return Color.clear
+                })
             }
-            }
+            .coordinateSpace(name: "scroll")
         }
         .sheet(isPresented: $showingCreateCollection) {
             CreateCollectionView()
@@ -111,8 +115,10 @@ struct Navigation: View {
 }
 
 struct HeadLine: View {
-    @State private var showLocationPicker = false
-    @State private var selectedLocation = "The tube"
+    @Query private var photoCollections: [PhotoCollection]
+    @Binding var selectedCollectionId: UUID?
+    @State private var showingCreateCollection = false
+    var isScrolledPast: Bool // 添加滚动状态属性
     
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -120,28 +126,37 @@ struct HeadLine: View {
                 Image(systemName: "magnifyingglass")
                     .font(.system(size: 20))
                     .foregroundColor(.gray)
-                Text("Finding alphabet in")
+                Text(isScrolledPast ? "Found alphabet in" : "Unfound alphabet in")
                     .foregroundColor(.gray)
                     .font(.system(size: 16))
             }
             
             Menu {
-                Button("The tube") {
-                    selectedLocation = "The tube"
+                ForEach(photoCollections) { collection in
+                    Button(collection.name) {
+                        selectedCollectionId = collection.id
+                    }
                 }
-                Button("Street") {
-                    selectedLocation = "Street"
+                
+                Divider()
+                
+                Button(action: {
+                    showingCreateCollection = true
+                }) {
+                    Label("创建新集合", systemImage: "plus.circle")
                 }
-                // 添加更多选项
             } label: {
                 HStack {
-                    Text(selectedLocation)
+                    Text(photoCollections.first(where: { $0.id == selectedCollectionId })?.name ?? "Select Collection")
                         .font(.system(size: 32, weight: .bold))
                         .foregroundColor(.black)
                     Image(systemName: "chevron.down")
                         .font(.system(size: 20))
                 }
             }
+        }
+        .sheet(isPresented: $showingCreateCollection) {
+            CreateCollectionView()
         }
     }
 }
@@ -180,16 +195,17 @@ struct Card: View {
     var title: String
     var description: String
     var photoItems: [PhotoItem]
+    var currentCollection: PhotoCollection?  // 添加 currentCollection 参数
     @State private var isLetterVisible = false
     @State private var isBackdropVisible = false
     @State private var isTextVisible = false
-    @State private var randomQuote: MotivationalQuote // 添加随机引用状态
+    @State private var randomQuote: MotivationalQuote
     
-    init(title: String, description: String, photoItems: [PhotoItem]) {
+    init(title: String, description: String, photoItems: [PhotoItem], currentCollection: PhotoCollection?) {
         self.title = title
         self.description = description
         self.photoItems = photoItems
-        // 在初始化时选择随机引用
+        self.currentCollection = currentCollection
         _randomQuote = State(initialValue: quotes.randomElement() ?? MotivationalQuote(quote: "Look at the world differently.", author: "Unknown"))
     }
     
@@ -254,13 +270,11 @@ struct Card: View {
                         .scaleEffect(isTextVisible ? 1 : 0.8)
 
                     HStack {
-                        Button(action: {
-                            // 处理按钮的点击事件
-                        }) {
+                        NavigationLink(destination: ViewfinderView(selectedLetter: title, currentCollection: currentCollection)) {
                             Image("takeimage")
                         }
                         Button(action: {
-                            // 处理按钮的点击事件
+                            // 处理导入按钮的点击事件
                         }) {
                             Image("import")
                         }
@@ -301,27 +315,30 @@ struct Card: View {
 }
 
 struct SlidingCards: View {
-    let letters = Array("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
     var photoItems: [PhotoItem]
+    var currentCollection: PhotoCollection?
+    var uncollectedLetters: [String]
     
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 0) {
-                ForEach(letters.indices, id: \.self) { index in
+            HStack(spacing: 40) {
+                ForEach(uncollectedLetters, id: \.self) { letter in // 使用字母本身作为 id
                     Card(
-                        title: String(letters[index]),
-                        description: "This is the letter \(letters[index]).",
-                        photoItems: photoItems
+                        title: letter,
+                        description: "This is the letter \(letter)",
+                        photoItems: photoItems,
+                        currentCollection: currentCollection
                     )
                     .scrollTransition(.animated) { content, phase in
                         content
-                            .opacity(phase.isIdentity ? 1 : 0.5)
+                            .opacity(phase.isIdentity ? 1 : 0.8)
                             .scaleEffect(phase.isIdentity ? 1 : 0.9)
                     }
                 }
+                .frame(width: 337-40)
             }
             .scrollTargetLayout()
-            .padding(.horizontal, 30)
+            .padding(.horizontal, 50)
         }
         .scrollTargetBehavior(.viewAligned)
     }
@@ -351,7 +368,6 @@ struct SmallCard: View {
     @State private var showPhotoPicker = false
     @Environment(\.modelContext) private var modelContext
 
-    // 获取当前 collection
     var currentCollection: PhotoCollection? {
         photoItems.first?.collection
     }
@@ -363,13 +379,13 @@ struct SmallCard: View {
                 .sorted(by: { $0.timestamp > $1.timestamp })
                 .first,
                let uiImage = UIImage(data: latestItem.imageData) {
-                // 有最新照片的情况
+                // 有照片的情况
                 Image(uiImage: uiImage)
                     .resizable()
                     .scaledToFill()
                     .frame(width: 100, height: 100)
                     .clipped()
-                    .background(Color.gray)
+                    .background(Color.gray) // 使用纯色背景
                     .cornerRadius(10)
                     .contextMenu {
                         Button(action: {
@@ -384,17 +400,19 @@ struct SmallCard: View {
                     }
             } else {
                 // 没有照片的情况
-                Button(action: {
-                    showPhotoPicker = true
-                }) {
-                    VStack {
-                        Text(letter)
-                            .font(.title)
-                            .fontWeight(.bold)
-                    }
-                    .frame(width: 100, height: 100)
-                    .background(Color.gray.opacity(0.2))
-                    .cornerRadius(10)
+                VStack {
+                    Image("smallcardbg") // 使用背景图片
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 100, height: 132)
+                        .cornerRadius(10)
+                    
+                    Text(letter.uppercased() + letter.lowercased()) // 显示小写字母
+                        .fontWeight(.bold)
+                        .font(.system(size: 14))
+                        .padding(.top, 4)
+                        .padding(.leading, 5)
+                        .padding(.trailing, 58)
                 }
             }
         }
