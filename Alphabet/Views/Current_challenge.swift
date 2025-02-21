@@ -13,6 +13,9 @@ struct Current_challenge: View {
     @State private var showingCreateCollection = false
     @State private var selectedCollectionId: UUID? = SampleData.collection.id  // 设置默认的示例集合 ID
     @State private var scrollProgress: CGFloat = 0.0 // 添加滚动进度状态
+    @State private var showingImagePreview = false
+    @State private var selectedPreviewPhotos: [PhotoItem] = []
+    @State private var selectedPreviewLetter: String = ""
     
     // 获取当前选中的collection
     var currentCollection: PhotoCollection? {
@@ -58,7 +61,12 @@ struct Current_challenge: View {
                         .foregroundColor(.gray)
                         .padding(.bottom, 10)
                     
-                    LetterGrid(photoItems: currentPhotos)
+                    LetterGrid(
+                        photoItems: currentPhotos,
+                        showingImagePreview: $showingImagePreview,
+                        selectedPreviewPhotos: $selectedPreviewPhotos,
+                        selectedPreviewLetter: $selectedPreviewLetter
+                    )
                 }
                 .background(GeometryReader { geo -> Color in
                     DispatchQueue.main.async {
@@ -78,6 +86,16 @@ struct Current_challenge: View {
             // 如果是第一次加载collections，自动选择第一个
             if selectedCollectionId == nil && !newValue.isEmpty {
                 selectedCollectionId = newValue.first?.id
+            }
+        }
+        .blur(radius: showingImagePreview ? 3 : 0) // 添加模糊效果
+        .overlay {
+            if showingImagePreview {
+                ImagePreviewer(
+                    photos: selectedPreviewPhotos,
+                    selectedLetter: selectedPreviewLetter,
+                    isPresented: $showingImagePreview
+                )
             }
         }
     }
@@ -347,14 +365,20 @@ struct SlidingCards: View {
 struct LetterGrid: View {
     let letters = Array("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
     let columns = Array(repeating: GridItem(.flexible(), spacing: 15), count: 3)
-    var photoItems: [PhotoItem]  // 通过属性传递
+    var photoItems: [PhotoItem]
+    @Binding var showingImagePreview: Bool
+    @Binding var selectedPreviewPhotos: [PhotoItem]
+    @Binding var selectedPreviewLetter: String
     
     var body: some View {
         LazyVGrid(columns: columns, spacing: 15) {
             ForEach(letters.indices, id: \.self) { index in
                 SmallCard(
                     letter: String(letters[index]),
-                    photoItems: photoItems
+                    photoItems: photoItems,
+                    showingImagePreview: $showingImagePreview,
+                    selectedPreviewPhotos: $selectedPreviewPhotos,
+                    selectedPreviewLetter: $selectedPreviewLetter
                 )
             }
         }
@@ -366,7 +390,9 @@ struct SmallCard: View {
     let letter: String
     var photoItems: [PhotoItem]
     @State private var showPhotoPicker = false
-    @State private var showImagePreview = false // 新增状态
+    @Binding var showingImagePreview: Bool
+    @Binding var selectedPreviewPhotos: [PhotoItem]
+    @Binding var selectedPreviewLetter: String
     @Environment(\.modelContext) private var modelContext
 
     var currentCollection: PhotoCollection? {
@@ -380,31 +406,35 @@ struct SmallCard: View {
                 .sorted(by: { $0.timestamp > $1.timestamp })
                 .first,
                let uiImage = UIImage(data: latestItem.imageData) {
-                // 有照片的情况
-                Image(uiImage: uiImage)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 100, height: 132)
-                    .clipped()
-                    .background(Color.gray)
-                    .cornerRadius(10)
-                    .onTapGesture {
-                        showImagePreview = true // 点击时显示预览
-                    }
-                    .contextMenu {
-                        Button(action: {
-                            showPhotoPicker = true
-                        }) {
-                            Label("更换照片", systemImage: "photo")
+                VStack {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 100, height: 132)
+                        .clipped()
+                        .background(Color.gray)
+                        .cornerRadius(10)
+                        .onTapGesture {
+                            selectedPreviewPhotos = photoItems.filter { $0.letter == letter }
+                            selectedPreviewLetter = letter
+                            showingImagePreview = true
                         }
-                        
-                        NavigationLink(destination: ViewfinderView(selectedLetter: letter, currentCollection: currentCollection)) {
-                            Label("拍摄新照片", systemImage: "camera.fill")
+                        .contextMenu {
+                            Button(action: {
+                                showPhotoPicker = true
+                            }) {
+                                Label("更换照片", systemImage: "photo")
+                            }
+                            
+                            NavigationLink(destination: ViewfinderView(selectedLetter: letter, currentCollection: currentCollection)) {
+                                Label("拍摄新照片", systemImage: "camera.fill")
+                            }
                         }
-                    }
-                    .sheet(isPresented: $showImagePreview) {
-                        ImagePreviewer(photos: photoItems.filter { $0.letter == letter }, selectedLetter: letter)
-                    }
+                    Text(letter.uppercased() + letter.lowercased())
+                        .fontWeight(.bold)
+                        .font(.system(size: 14))
+                        .padding(.top, 4)
+                }
             } else {
                 // 没有照片的情况
                 VStack {
