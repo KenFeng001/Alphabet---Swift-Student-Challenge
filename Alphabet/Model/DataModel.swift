@@ -20,6 +20,7 @@ final class DataModel: ObservableObject {
         
     init() {
         Task {
+            await camera.start()
             await handleCameraPreviews()
         }
         
@@ -66,20 +67,15 @@ final class DataModel: ObservableObject {
     
     
     private func unpackPhoto(_ photo: AVCapturePhoto) -> PhotoData? {
-        guard let imageData = photo.fileDataRepresentation() else { return nil }
-
-        guard let previewCGImage = photo.cgImageRepresentation(),
-           let metadataOrientation = photo.metadata[String(kCGImagePropertyOrientation)] as? UInt32,
+        guard let imageData = photo.fileDataRepresentation(),
+              let previewCGImage = photo.previewCGImageRepresentation(),
+              let metadataOrientation = photo.metadata[String(kCGImagePropertyOrientation)] as? UInt32,
               let cgImageOrientation = CGImagePropertyOrientation(rawValue: metadataOrientation) else { return nil }
+        
         let imageOrientation = Image.Orientation(cgImageOrientation)
         let thumbnailImage = Image(decorative: previewCGImage, scale: 1, orientation: imageOrientation)
         
-        let photoDimensions = photo.resolvedSettings.photoDimensions
-        let imageSize = (width: Int(photoDimensions.width), height: Int(photoDimensions.height))
-        let previewDimensions = photo.resolvedSettings.previewDimensions
-        let thumbnailSize = (width: Int(previewDimensions.width), height: Int(previewDimensions.height))
-        
-        return PhotoData(thumbnailImage: thumbnailImage, thumbnailSize: thumbnailSize, imageData: imageData, imageSize: imageSize)
+        return PhotoData(thumbnailImage: thumbnailImage, imageData: imageData)
     }
     
 
@@ -87,9 +83,7 @@ final class DataModel: ObservableObject {
 
 fileprivate struct PhotoData {
     var thumbnailImage: Image
-    var thumbnailSize: (width: Int, height: Int)
     var imageData: Data
-    var imageSize: (width: Int, height: Int)
 }
 
 fileprivate extension CIImage {

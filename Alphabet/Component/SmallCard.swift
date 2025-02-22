@@ -6,14 +6,13 @@ struct SmallCard: View {
     let letter: String
     var photoItems: [PhotoItem]
     @State private var showPhotoPicker = false
+    @State private var showCamera = false
     @Binding var showingImagePreview: Bool
     @Binding var selectedPreviewPhotos: [PhotoItem]
     @Binding var selectedPreviewLetter: String
     @Environment(\.modelContext) private var modelContext
 
-    var currentCollection: PhotoCollection? {
-        photoItems.first?.collection
-    }
+    var currentCollection: PhotoCollection? 
     
     var body: some View {
         Group {
@@ -42,7 +41,9 @@ struct SmallCard: View {
                                 Label("更换照片", systemImage: "photo")
                             }
                             
-                            NavigationLink(destination: ViewfinderView(selectedLetter: letter, currentCollection: currentCollection)) {
+                            Button(action: {
+                                showCamera = true
+                            }) {
                                 Label("拍摄新照片", systemImage: "camera.fill")
                             }
                         }
@@ -61,7 +62,9 @@ struct SmallCard: View {
                             Label("上传照片", systemImage: "photo")
                         }
                         
-                        NavigationLink(destination: ViewfinderView(selectedLetter: letter, currentCollection: currentCollection)) {
+                        Button(action: {
+                            showCamera = true
+                        }) {
                             Label("拍摄照片", systemImage: "camera.fill")
                         }
                     } label: {
@@ -91,6 +94,12 @@ struct SmallCard: View {
             ),
             matching: .images
         )
+        .navigationDestination(isPresented: $showCamera) {
+            ViewfinderView(
+                selectedLetter: letter,
+                currentCollection: currentCollection
+            )
+        }
     }
     
     // 加载选中的照片

@@ -7,6 +7,15 @@ struct HeadLine: View {
     @State private var showingCreateCollection = false
     var isScrolledPast: Bool
     
+    // 获取当前选中的集合名称
+    private var currentCollectionName: String {
+        if let selectedId = selectedCollectionId,
+           let collection = photoCollections.first(where: { $0.id == selectedId }) {
+            return collection.name
+        }
+        return SampleData.collection.name
+    }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 4) {
@@ -31,10 +40,10 @@ struct HeadLine: View {
                     showingCreateCollection = true
                 }) {
                     Label("创建新集合", systemImage: "plus.circle")
-                }
+                }   
             } label: {
                 HStack {
-                    Text(photoCollections.first(where: { $0.id == selectedCollectionId })?.name ?? "示例集合")
+                    Text(currentCollectionName)
                         .font(.system(size: 32, weight: .bold))
                         .foregroundColor(.black)
                     Image(systemName: "chevron.down")
@@ -43,7 +52,14 @@ struct HeadLine: View {
             }
         }
         .sheet(isPresented: $showingCreateCollection) {
-            CreateCollectionView()
+            CreateCollectionView { newId in
+                selectedCollectionId = newId
+            }
+        }
+        .onAppear {
+            if selectedCollectionId == nil {
+                selectedCollectionId = SampleData.collection.id
+            }
         }
     }
 } 

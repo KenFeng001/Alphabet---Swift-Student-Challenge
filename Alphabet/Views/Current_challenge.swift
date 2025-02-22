@@ -11,7 +11,7 @@ import PhotosUI
 struct Current_challenge: View {
     @Query private var photoCollections: [PhotoCollection]
     @State private var showingCreateCollection = false
-    @State private var selectedCollectionId: UUID? = SampleData.collection.id  // 设置默认的示例集合 ID
+    @Binding var selectedCollectionId: UUID?  // 改为 Binding
     @State private var scrollProgress: CGFloat = 0.0 // 添加滚动进度状态
     @State private var showingImagePreview = false
     @State private var selectedPreviewPhotos: [PhotoItem] = []
@@ -32,78 +32,80 @@ struct Current_challenge: View {
     }
     
     var body: some View {
-        VStack(spacing: 38) {
-            
-            VStack(spacing: 20) {
-                HStack {
-                    HeadLine(
-                        selectedCollectionId: $selectedCollectionId,
-                        isScrolledPast: scrollProgress > 0.3 // 传递滚动状态
-                    )
-                    Spacer()
-                    ProgressBar(currentCollection: currentCollection)
-                }
-                .padding(.leading)
-            }
-            
-            ScrollView {
-                SlidingCards(photoItems: currentPhotos, currentCollection: currentCollection, uncollectedLetters: uncollectedLetters)
-                        .frame(height: 461)
-                VStack {
-
-                    
-                    Divider()
-                        .padding(.vertical, 10)
-                    
-                    Image(systemName: "sparkle.magnifyingglass")
-                        .font(.title)
-                        .foregroundColor(.gray)
-                        .padding(.bottom, 10)
-                    
-                    LetterGrid(
-                        photoItems: currentPhotos,
-                        showingImagePreview: $showingImagePreview,
-                        selectedPreviewPhotos: $selectedPreviewPhotos,
-                        selectedPreviewLetter: $selectedPreviewLetter
-                    )
-                }
-                .background(GeometryReader { geo -> Color in
-                    DispatchQueue.main.async {
-                        let offset = -geo.frame(in: .named("scroll")).origin.y
-                        let contentHeight = geo.size.height - UIScreen.main.bounds.height
-                        scrollProgress = contentHeight > 0 ? offset / contentHeight : 0
+        NavigationStack {  // 添加 NavigationStack
+            VStack(spacing: 38) {
+                VStack(spacing: 20) {
+                    HStack {
+                        HeadLine(
+                            selectedCollectionId: $selectedCollectionId,
+                            isScrolledPast: scrollProgress > 0.3 // 传递滚动状态
+                        )
+                        Spacer()
+                        ProgressBar(currentCollection: currentCollection)
                     }
-                    return Color.clear
-                })
-            }
-            .coordinateSpace(name: "scroll")
-        }
-        .sheet(isPresented: $showingCreateCollection) {
-            CreateCollectionView()
-        }
-        .onChange(of: photoCollections) { oldValue, newValue in
-            // 如果是第一次加载collections，自动选择第一个
-            if selectedCollectionId == nil && !newValue.isEmpty {
-                selectedCollectionId = newValue.first?.id
-            }
-        }
-        .blur(radius: showingImagePreview ? 3 : 0) // 添加模糊效果
-        .overlay {
-            ZStack {
-                if showingImagePreview {
-                    ImagePreviewer(
-                        photos: selectedPreviewPhotos,
-                        selectedLetter: selectedPreviewLetter,
-                        isPresented: $showingImagePreview
-                    )
-                    .transition(.asymmetric(
-                        insertion: .opacity.combined(with: .scale(scale: 5)),
-                        removal: .opacity.combined(with: .scale(scale: 0.9))
-                    ))
+                    .padding(.leading)
+                }
+                
+                ScrollView {
+                    SlidingCards(photoItems: currentPhotos, currentCollection: currentCollection, uncollectedLetters: uncollectedLetters)
+                            .frame(height: 461)
+                    VStack {
+
+                        
+                        Divider()
+                            .padding(.vertical, 10)
+                        
+                        Image(systemName: "sparkle.magnifyingglass")
+                            .font(.title)
+                            .foregroundColor(.gray)
+                            .padding(.bottom, 10)
+                        
+                        LetterGrid(
+                            photoItems: currentPhotos,
+                            currentCollection: currentCollection,
+                            showingImagePreview: $showingImagePreview,
+                            selectedPreviewPhotos: $selectedPreviewPhotos,
+                            selectedPreviewLetter: $selectedPreviewLetter
+                        )
+                    }
+                    .background(GeometryReader { geo -> Color in
+                        let offset = geo.frame(in: .global).minY
+                        DispatchQueue.main.async {
+                            scrollProgress = -offset / 100
+                        }
+                        return Color.clear
+                    })
                 }
             }
-            .animation(.spring(response: 0.3, dampingFraction: 0.8), value: showingImagePreview)
-        }
+            .sheet(isPresented: $showingCreateCollection) {
+                CreateCollectionView { newId in
+                    selectedCollectionId = newId  // 通过 @Binding 更新 ContentView 中的值
+                }
+            }
+            .onChange(of: photoCollections) { oldValue, newValue in
+                // 如果是第一次加载collections，自动选择第一个
+                if selectedCollectionId == nil && !newValue.isEmpty {
+                    selectedCollectionId = newValue.first?.id
+                }
+            }
+            .blur(radius: showingImagePreview ? 3 : 0) // 添加模糊效果
+            .overlay {
+                ZStack {
+                    if showingImagePreview {
+                        ImagePreviewer(
+                            photos: selectedPreviewPhotos,
+                            selectedLetter: selectedPreviewLetter,
+                            isPresented: $showingImagePreview
+                        )
+                        .transition(.asymmetric(
+                            insertion: .opacity.combined(with: .scale(scale: 5)),
+                            removal: .opacity.combined(with: .scale(scale: 0.9))
+                        ))
+                    }
+                }
+                .animation(.spring(response: 0.3, dampingFraction: 0.8), value: showingImagePreview)
+            }
+        }  // NavigationStack 结束
     }
 }
 
@@ -112,9 +114,10 @@ struct CreateCollectionView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     @State private var collectionName: String = ""
-    @State private var isTimeLimited: Bool = false // 控制时间限制的状态
-    @State private var endDate: Date = Date() // 默认结束时间为当前时间
-
+    @State private var isTimeLimited: Bool = false
+    @State private var endDate: Date = Date()
+    var onCollectionCreated: (UUID) -> Void  // 添加回调函数
+    
     var body: some View {
         NavigationView {
             Form {
@@ -133,6 +136,7 @@ struct CreateCollectionView: View {
                 Button("Create") {
                     let tempCollection = PhotoCollection(name: collectionName, expectedEndDate: endDate)
                     modelContext.insert(tempCollection)
+                    onCollectionCreated(tempCollection.id)  // 将新 ID 传递给回调函数
                     print("new collection has created")
                     dismiss()
                 }
@@ -146,6 +150,6 @@ struct CreateCollectionView: View {
 }
 
 #Preview {
-    Current_challenge()
+    Current_challenge(selectedCollectionId: .constant(SampleData.collection.id))
         .modelContainer(SampleData.previewContainer)
 }

@@ -4,6 +4,7 @@ struct LetterGrid: View {
     let letters = Array("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
     let columns = Array(repeating: GridItem(.flexible(), spacing: 15), count: 3)
     var photoItems: [PhotoItem]
+    var currentCollection: PhotoCollection?
     @Binding var showingImagePreview: Bool
     @Binding var selectedPreviewPhotos: [PhotoItem]
     @Binding var selectedPreviewLetter: String
@@ -16,7 +17,8 @@ struct LetterGrid: View {
                     photoItems: photoItems,
                     showingImagePreview: $showingImagePreview,
                     selectedPreviewPhotos: $selectedPreviewPhotos,
-                    selectedPreviewLetter: $selectedPreviewLetter
+                    selectedPreviewLetter: $selectedPreviewLetter,
+                    currentCollection: currentCollection
                 )
             }
         }

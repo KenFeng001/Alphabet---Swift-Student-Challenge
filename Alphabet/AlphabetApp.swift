@@ -35,19 +35,27 @@ struct AlphabetApp: App {
     
     private func createStarterCollectionIfNeeded() {
         Task { @MainActor in
-            let context = container.mainContext
-            // 检查是否存在任何 Collection
-            let descriptor = FetchDescriptor<PhotoCollection>()
-            let existingCollections = try? context.fetch(descriptor)
-            
-            // 只在没有任何 collection 时创建 Starter Collection
-            if existingCollections?.isEmpty ?? true {
-                let starterCollection = PhotoCollection(
-                    name: "Starter",
-                    expectedEndDate: Date().addingTimeInterval(30 * 24 * 60 * 60)
-                )
-                context.insert(starterCollection)
-                try? context.save()
+            do {
+                let context = container.mainContext
+                let descriptor = FetchDescriptor<PhotoCollection>()
+                let existingCollections = try context.fetch(descriptor)
+                
+                // 如果没有任何 collection，导入示例数据
+                if existingCollections.isEmpty {
+                    // 导入 SampleData 中的 collection
+                    let sampleCollection = SampleData.collection
+                    context.insert(sampleCollection)
+                    
+                    // 导入示例照片
+                    for photo in SampleData.photos {
+                        context.insert(photo)
+                    }
+                    
+                    try context.save()
+                    print("成功导入示例数据")
+                }
+            } catch {
+                print("创建或导入 Collection 失败: \(error)")
             }
         }
     }

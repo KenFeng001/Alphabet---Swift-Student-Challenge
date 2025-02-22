@@ -3,7 +3,7 @@ import SwiftData
 
 struct SampleData {
     static let collection = PhotoCollection(
-        name: "示例集合",
+        name: "TFL Wander",
         expectedEndDate: Date().addingTimeInterval(30 * 24 * 3600)
     )
     
