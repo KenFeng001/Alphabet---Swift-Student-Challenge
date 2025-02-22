@@ -33,7 +33,6 @@ struct Current_challenge: View {
     
     var body: some View {
         VStack(spacing: 38) {
-            Navigation() // 固定在顶部
             
             VStack(spacing: 20) {
                 HStack {
@@ -90,13 +89,20 @@ struct Current_challenge: View {
         }
         .blur(radius: showingImagePreview ? 3 : 0) // 添加模糊效果
         .overlay {
-            if showingImagePreview {
-                ImagePreviewer(
-                    photos: selectedPreviewPhotos,
-                    selectedLetter: selectedPreviewLetter,
-                    isPresented: $showingImagePreview
-                )
+            ZStack {
+                if showingImagePreview {
+                    ImagePreviewer(
+                        photos: selectedPreviewPhotos,
+                        selectedLetter: selectedPreviewLetter,
+                        isPresented: $showingImagePreview
+                    )
+                    .transition(.asymmetric(
+                        insertion: .opacity.combined(with: .scale(scale: 5)),
+                        removal: .opacity.combined(with: .scale(scale: 0.9))
+                    ))
+                }
             }
+            .animation(.spring(response: 0.3, dampingFraction: 0.8), value: showingImagePreview)
         }
     }
 }

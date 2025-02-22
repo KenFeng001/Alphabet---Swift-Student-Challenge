@@ -1,9 +1,12 @@
 import SwiftUI
+
 struct Navigation: View {
+    @Binding var selectedTab: Tab
+    
     var body: some View {
         HStack {
             Button(action: {
-                // 处理 Collection 按钮的点击事件
+                selectedTab = .collection
             }) {
                 HStack {
                     Image(systemName: "photo.on.rectangle")
@@ -15,7 +18,7 @@ struct Navigation: View {
               
             // 右侧的图标
             Button(action: {
-                // 处理 Finding 按钮的点击事件
+                selectedTab = .find
             }) {
                 HStack {
                     Image(systemName: "magnifyingglass")
@@ -27,5 +30,10 @@ struct Navigation: View {
             Spacer()
         }
         .padding(.leading, 20)
+        .frame(height: 44)
     }
+}
+
+#Preview {
+    Navigation(selectedTab: .constant(.collection))
 }
