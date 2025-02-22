@@ -7,8 +7,12 @@
 
 import SwiftUI
 import SwiftData
+import Foundation  // 如果需要的话
+
+// 如果 SortOption 在单独的模块中，需要导入该模块
 
 struct CollectionDetailView: View {
+    @Environment(\.dismiss) private var dismiss  // 添加 dismiss 环境变量
     var displayedCollection: PhotoCollection
     @State private var sortBy: SortOption = .time
     @State private var isStacked: Bool = true
@@ -19,11 +23,6 @@ struct CollectionDetailView: View {
     @State private var selectedPreviewPhotos: [PhotoItem] = []
     @State private var selectedPreviewLetter: String = ""
     
-    enum SortOption {
-        case time
-        case alphabet
-    }
-    
     var body: some View {
         ScrollView {
             LetterGrid(
@@ -31,15 +30,19 @@ struct CollectionDetailView: View {
                 currentCollection: displayedCollection,
                 showingImagePreview: $showingImagePreview,
                 selectedPreviewPhotos: $selectedPreviewPhotos,
-                selectedPreviewLetter: $selectedPreviewLetter
+                selectedPreviewLetter: $selectedPreviewLetter,
+                isStacked: isStacked,
+                showUnfinished: showUnfinished,
+                sortBy: sortBy
             )
         }
+        .navigationBarBackButtonHidden(true)  // 隐藏默认的返回按钮
         .navigationBarTitleDisplayMode(.large)
         .navigationTitle(displayedCollection.name)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button {
-                    // 返回操作
+                    dismiss()
                 } label: {
                     HStack(spacing: 4) {
                         Image(systemName: "chevron.left")

@@ -55,7 +55,10 @@ struct Current_challenge: View {
                             currentCollection: currentCollection,
                             showingImagePreview: $showingImagePreview,
                             selectedPreviewPhotos: $selectedPreviewPhotos,
-                            selectedPreviewLetter: $selectedPreviewLetter
+                            selectedPreviewLetter: $selectedPreviewLetter,
+                            isStacked: true,  // Current_challenge 中总是堆叠显示
+                            showUnfinished: true,  // Current_challenge 中总是显示未完成项
+                            sortBy: .alphabet  // Current_challenge 中按字母顺序排序
                         )
                     }
                 }
