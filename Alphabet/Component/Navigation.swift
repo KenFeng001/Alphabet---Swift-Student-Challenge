@@ -1,30 +1,33 @@
 import SwiftUI
 
 struct Navigation: View {
-    @Binding var selectedTab: Tab
+    var currentTab: Tab
+    var onTabChange: (Tab) -> Void
     
     var body: some View {
         HStack {
             Button(action: {
-                selectedTab = .collection
+                onTabChange(.collection)
             }) {
                 HStack {
                     Image(systemName: "photo.on.rectangle")
-                        .foregroundColor(.gray)
+                        .foregroundColor(currentTab == .collection ? .black : .gray)
                     Text("Collection")
-                        .foregroundColor(.gray)
+                        .foregroundColor(currentTab == .collection ? .black : .gray)
+                        .fontWeight(currentTab == .collection ? .bold : .regular)
                 }
             }
               
             // 右侧的图标
             Button(action: {
-                selectedTab = .find
+                onTabChange(.find)
             }) {
                 HStack {
                     Image(systemName: "magnifyingglass")
-                        .foregroundColor(.gray)
+                        .foregroundColor(currentTab == .find ? .black : .gray)
                     Text("Finding")
-                        .foregroundColor(.gray)
+                        .foregroundColor(currentTab == .find ? .black : .gray)
+                        .fontWeight(currentTab == .find ? .bold : .regular)
                 }
             }
             Spacer()
@@ -35,5 +38,5 @@ struct Navigation: View {
 }
 
 #Preview {
-    Navigation(selectedTab: .constant(.collection))
+    Navigation(currentTab: .collection) { _ in }
 }

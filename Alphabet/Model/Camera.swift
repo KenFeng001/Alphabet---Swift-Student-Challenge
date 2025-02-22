@@ -359,6 +359,51 @@ class Camera: NSObject {
             /*#-code-walkthrough(photoflow.capturePhoto)*/
         }
     }
+    
+    private var telephotoDevice: AVCaptureDevice? {
+        allCaptureDevices.first { device in
+            device.deviceType == .builtInTelephotoCamera
+        }
+    }
+    
+    private var currentZoomFactor: CGFloat = 1.0
+    
+    func toggleZoom() {
+        sessionQueue.async {
+            if let telephotoDevice = self.telephotoDevice {
+                // 如果有长焦镜头，切换到长焦镜头
+                if self.captureDevice == telephotoDevice {
+                    // 如果当前是长焦，切回主摄
+                    self.captureDevice = self.backCaptureDevices.first
+                } else {
+                    // 切换到长焦
+                    self.captureDevice = telephotoDevice
+                }
+            } else {
+                // 如果没有长焦镜头，使用数码变焦
+                guard let device = self.captureDevice else { return }
+                
+                do {
+                    try device.lockForConfiguration()
+                    // 在1x和2x之间切换
+                    let newZoomFactor = self.currentZoomFactor == 1.0 ? 2.0 : 1.0
+                    device.videoZoomFactor = newZoomFactor
+                    self.currentZoomFactor = newZoomFactor
+                    device.unlockForConfiguration()
+                } catch {
+                    logger.error("Error setting zoom: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
+    
+    var zoomDescription: String {
+        if telephotoDevice != nil {
+            return captureDevice == telephotoDevice ? "2x" : "1x"
+        } else {
+            return currentZoomFactor == 1.0 ? "1x" : "2x"
+        }
+    }
 }
 
 extension Camera: AVCapturePhotoCaptureDelegate {

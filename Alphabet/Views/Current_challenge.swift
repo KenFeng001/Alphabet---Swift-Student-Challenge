@@ -11,7 +11,9 @@ import PhotosUI
 struct Current_challenge: View {
     @Query private var photoCollections: [PhotoCollection]
     @State private var showingCreateCollection = false
-    @Binding var selectedCollectionId: UUID?  // 改为 Binding
+    @Binding var selectedCollectionId: UUID?
+    var currentTab: Tab
+    var onTabChange: (Tab) -> Void
     @State private var scrollProgress: CGFloat = 0.0 // 添加滚动进度状态
     @State private var showingImagePreview = false
     @State private var selectedPreviewPhotos: [PhotoItem] = []
@@ -32,8 +34,10 @@ struct Current_challenge: View {
     }
     
     var body: some View {
-        NavigationStack {  // 添加 NavigationStack
+        NavigationStack {
             VStack(spacing: 38) {
+                Navigation(currentTab: currentTab, onTabChange: onTabChange)
+                
                 VStack(spacing: 20) {
                     HStack {
                         HeadLine(
@@ -150,6 +154,6 @@ struct CreateCollectionView: View {
 }
 
 #Preview {
-    Current_challenge(selectedCollectionId: .constant(SampleData.collection.id))
+    Current_challenge(selectedCollectionId: .constant(SampleData.collection.id), currentTab: .collection) { _ in }
         .modelContainer(SampleData.previewContainer)
 }
