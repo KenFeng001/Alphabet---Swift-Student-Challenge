@@ -14,8 +14,11 @@ struct CollectionView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 16) {
                         ForEach(photoCollections) { collection in
-                            NavigationLink(destination: CollectionDetailView(displayedCollection: collection)) {
+                            NavigationLink {
+                                CollectionDetailView(displayedCollection: collection)
+                            } label: {
                                 Collection(photoCollection: collection)
+                                    .foregroundColor(.black)
                             }
                         }
                     }

@@ -9,41 +9,85 @@ import SwiftUI
 import SwiftData
 
 struct CollectionDetailView: View {
-    @Environment(\.dismiss) private var dismiss
     var displayedCollection: PhotoCollection
+    @State private var sortBy: SortOption = .time
+    @State private var isStacked: Bool = true
+    @State private var showUnfinished: Bool = true
+    
+    enum SortOption {
+        case time
+        case alphabet
+    }
     
     var body: some View {
         ScrollView {
-            VStack(spacing: 0) {
-                // 内容区域
-                VStack(alignment: .leading, spacing: 20) {
-                    // 集合信息
-                    Text(displayedCollection.name)
-                        .font(.system(size: 32, weight: .bold))
-                    
-                    // 这里可以添加更多集合详情内容
-                    
-                }
-                .padding()
-            }
+
         }
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarTitleDisplayMode(.large)
+        .navigationTitle(displayedCollection.name)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: {
-                    dismiss()
-                }) {
+                Button {
+                    // 返回操作
+                } label: {
                     HStack(spacing: 4) {
                         Image(systemName: "chevron.left")
-                        Text("Back")
+                        Text("Collection")
                     }
                 }
             }
             
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: {
-                    // 添加更多操作
-                }) {
+                Menu {
+                    // 排序选项
+                    Menu("Sort by") {
+                        Button {
+                            sortBy = .time
+                        } label: {
+                            HStack {
+                                Text("Time")
+                                if sortBy == .time {
+                                    Image(systemName: "checkmark")
+                                }
+                            }
+                        }
+                        
+                        Button {
+                            sortBy = .alphabet
+                        } label: {
+                            HStack {
+                                Text("Alphabet")
+                                if sortBy == .alphabet {
+                                    Image(systemName: "checkmark")
+                                }
+                            }
+                        }
+                    }
+                    
+                    // 堆叠选项
+                    Button {
+                        isStacked.toggle()
+                    } label: {
+                        HStack {
+                            Text(isStacked ? "Unstack" : "Stack")
+                            if isStacked {
+                                Image(systemName: "checkmark")
+                            }
+                        }
+                    }
+                    
+                    // 显示未完成选项
+                    Button {
+                        showUnfinished.toggle()
+                    } label: {
+                        HStack {
+                            Text(showUnfinished ? "Hide Unfinished" : "Show Unfinished")
+                            if showUnfinished {
+                                Image(systemName: "checkmark")
+                            }
+                        }
+                    }
+                } label: {
                     Image(systemName: "ellipsis")
                 }
             }
@@ -52,6 +96,9 @@ struct CollectionDetailView: View {
 }
 
 #Preview {
-    CollectionDetailView(displayedCollection: SampleData.collection)
-        .modelContainer(SampleData.previewContainer)
+    NavigationStack {
+        CollectionDetailView(displayedCollection: SampleData.collection)
+    }
+    .modelContainer(SampleData.previewContainer)
 }
+

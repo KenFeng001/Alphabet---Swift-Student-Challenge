@@ -70,7 +70,7 @@ class PhotoCollection {
         let allLetters = Array("ABCDEFGHIJKLMNOPQRSTUVWXYZ").map(String.init)
         let collectedSet = Set(collectedLetters)
         return allLetters.filter { !collectedSet.contains($0) }
-    }
+   }
     
     // 固定特定字母的 PhotoItem
     func pinPhotoItem(for letter: String, photoItem: PhotoItem) {

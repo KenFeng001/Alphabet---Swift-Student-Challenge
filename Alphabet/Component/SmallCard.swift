@@ -12,41 +12,61 @@ struct SmallCard: View {
     @Binding var selectedPreviewLetter: String
     @Environment(\.modelContext) private var modelContext
 
-    var currentCollection: PhotoCollection? 
+    var currentCollection: PhotoCollection?
+    
+    private var letterPhotos: [PhotoItem] {
+        photoItems.filter { $0.letter == letter }
+    }
     
     var body: some View {
         Group {
-            if let latestItem = photoItems
-                .filter({ $0.letter == letter })
-                .sorted(by: { $0.timestamp > $1.timestamp })
-                .first,
-               let uiImage = UIImage(data: latestItem.imageData) {
+            if let pinnedItem = letterPhotos.first(where: { $0.isPinned }),
+               let pinnedImage = UIImage(data: pinnedItem.imageData) {
                 VStack {
-                    Image(uiImage: uiImage)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: 100, height: 132)
-                        .clipped()
-                        .background(Color.gray)
-                        .cornerRadius(10)
-                        .onTapGesture {
-                            selectedPreviewPhotos = photoItems.filter { $0.letter == letter }
-                            selectedPreviewLetter = letter
-                            showingImagePreview = true
+                    ZStack {
+                        // 如果有其他照片，显示在底层
+                        if let secondItem = letterPhotos.first(where: { !$0.isPinned }),
+                           let secondImage = UIImage(data: secondItem.imageData) {
+                            Image(uiImage: secondImage)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 100, height: 132)
+                                .clipped()
+                                .background(Color.gray)
+                                .cornerRadius(10)
+                                .offset(x: 4, y: -5)
+                                .rotationEffect(.degrees(3))
+                                .opacity(0.5)
                         }
-                        .contextMenu {
-                            Button(action: {
-                                showPhotoPicker = true
-                            }) {
-                                Label("更换照片", systemImage: "photo")
-                            }
-                            
-                            Button(action: {
-                                showCamera = true
-                            }) {
-                                Label("拍摄新照片", systemImage: "camera.fill")
-                            }
+                        
+                        // 固定的照片显示在上层
+                        Image(uiImage: pinnedImage)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 100, height: 132)
+                            .clipped()
+                            .background(Color.gray)
+                            .cornerRadius(10)
+                    }
+                    .onTapGesture {
+                        selectedPreviewPhotos = letterPhotos
+                        selectedPreviewLetter = letter
+                        showingImagePreview = true
+                    }
+                    .contextMenu {
+                        Button(action: {
+                            showPhotoPicker = true
+                        }) {
+                            Label("更换照片", systemImage: "photo")
                         }
+                        
+                        Button(action: {
+                            showCamera = true
+                        }) {
+                            Label("拍摄新照片", systemImage: "camera.fill")
+                        }
+                    }
+                    
                     Text(letter.uppercased() + letter.lowercased())
                         .fontWeight(.bold)
                         .font(.system(size: 14))
@@ -102,7 +122,6 @@ struct SmallCard: View {
         }
     }
     
-    // 加载选中的照片
     private func loadImage(from item: PhotosPickerItem) {
         Task {
             if let data = try? await item.loadTransferable(type: Data.self),

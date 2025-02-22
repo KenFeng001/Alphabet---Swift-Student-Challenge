@@ -76,9 +76,10 @@ struct ViewfinderImagePreview: View {
         let photoItem = PhotoItem(
             letter: selectedLetter, 
             imageData: imageData,
-            collection: currentCollection // 设置照片所属的collection
+            collection: currentCollection
         )
         modelContext.insert(photoItem)
+        currentCollection?.pinPhotoItem(for: selectedLetter, photoItem: photoItem)
         print("Saving image with letter: \(selectedLetter) to collection: \(currentCollection?.name ?? "none")")
     }
 }

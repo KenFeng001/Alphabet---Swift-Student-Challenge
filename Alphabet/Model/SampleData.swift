@@ -8,9 +8,10 @@ struct SampleData {
     )
     
     static let photos = [
+        PhotoItem(letter: "B", imageData: UIImage(named: "B")?.jpegData(compressionQuality: 0.8) ?? Data(), collection: collection, isPinned: true),
         PhotoItem(letter: "B", imageData: UIImage(named: "B")?.jpegData(compressionQuality: 0.8) ?? Data(), collection: collection),
-        PhotoItem(letter: "H", imageData: UIImage(named: "H")?.jpegData(compressionQuality: 0.8) ?? Data(), collection: collection),
-        PhotoItem(letter: "Y", imageData: UIImage(named: "Y")?.jpegData(compressionQuality: 0.8) ?? Data(), collection: collection)
+        PhotoItem(letter: "H", imageData: UIImage(named: "H")?.jpegData(compressionQuality: 0.8) ?? Data(), collection: collection, isPinned: true),
+        PhotoItem(letter: "Y", imageData: UIImage(named: "Y")?.jpegData(compressionQuality: 0.8) ?? Data(), collection: collection, isPinned: true)
     ]
     
     @MainActor

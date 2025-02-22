@@ -49,6 +49,7 @@ final class DataModel: ObservableObject {
                 thumbnailImage = photoData.thumbnailImage
                 navigateToPreview = true
                 imageData = photoData.imageData
+
             }
 //            savePhoto(imageData: photoData.imageData)
         }
