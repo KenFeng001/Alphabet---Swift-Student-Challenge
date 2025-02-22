@@ -14,6 +14,11 @@ struct CollectionDetailView: View {
     @State private var isStacked: Bool = true
     @State private var showUnfinished: Bool = true
     
+    // 添加图片预览所需的状态
+    @State private var showingImagePreview = false
+    @State private var selectedPreviewPhotos: [PhotoItem] = []
+    @State private var selectedPreviewLetter: String = ""
+    
     enum SortOption {
         case time
         case alphabet
@@ -21,7 +26,13 @@ struct CollectionDetailView: View {
     
     var body: some View {
         ScrollView {
-
+            LetterGrid(
+                photoItems: displayedCollection.photos,
+                currentCollection: displayedCollection,
+                showingImagePreview: $showingImagePreview,
+                selectedPreviewPhotos: $selectedPreviewPhotos,
+                selectedPreviewLetter: $selectedPreviewLetter
+            )
         }
         .navigationBarTitleDisplayMode(.large)
         .navigationTitle(displayedCollection.name)
@@ -90,6 +101,19 @@ struct CollectionDetailView: View {
                 } label: {
                     Image(systemName: "ellipsis")
                 }
+            }
+        }
+        // 添加图片预览的overlay
+        .blur(radius: showingImagePreview ? 3 : 0)
+        .overlay {
+            if showingImagePreview {
+                ImagePreviewer(
+                    photos: selectedPreviewPhotos,
+                    selectedLetter: selectedPreviewLetter,
+                    isPresented: $showingImagePreview
+                )
+                .ignoresSafeArea()
+                .zIndex(1)
             }
         }
     }
