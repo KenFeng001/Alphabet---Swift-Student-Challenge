@@ -23,7 +23,7 @@ struct Navigation: View {
                 onTabChange(.find)
             }) {
                 HStack {
-                    Image(systemName: "magnifyingglass")
+                    Image(systemName: "character.magnify")
                         .foregroundColor(currentTab == .find ? .black : .gray)
                     Text("Finding")
                         .foregroundColor(currentTab == .find ? .black : .gray)

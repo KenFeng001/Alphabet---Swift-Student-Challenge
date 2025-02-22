@@ -14,7 +14,9 @@ struct CollectionView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 16) {
                         ForEach(photoCollections) { collection in
-                            Collection(photoCollection: collection)
+                            NavigationLink(destination: CollectionDetailView(displayedCollection: collection)) {
+                                Collection(photoCollection: collection)
+                            }
                         }
                     }
                     .padding(.horizontal, 16)

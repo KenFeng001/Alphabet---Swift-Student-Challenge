@@ -35,34 +35,20 @@ struct Current_challenge: View {
     
     var body: some View {
         NavigationStack {
-            VStack(spacing: 38) {
-                Navigation(currentTab: currentTab, onTabChange: onTabChange)
-                
-                VStack(spacing: 20) {
-                    HStack {
-                        HeadLine(
-                            selectedCollectionId: $selectedCollectionId,
-                            isScrolledPast: scrollProgress > 0.3 // 传递滚动状态
-                        )
-                        Spacer()
-                        ProgressBar(currentCollection: currentCollection)
-                    }
-                    .padding(.leading)
-                }
-                
-                ScrollView {
-                    SlidingCards(photoItems: currentPhotos, currentCollection: currentCollection, uncollectedLetters: uncollectedLetters)
-                            .frame(height: 461)
+            ScrollView {
+                VStack(spacing: 0) {
+                    // 添加一个空的视图来抵消顶部空间
+                    Color.clear
+                        .frame(height: 140) // Navigation + HeadLine + spacing的总高度
+                    
+                    SlidingCards(photoItems: currentPhotos, 
+                               currentCollection: currentCollection, 
+                               uncollectedLetters: uncollectedLetters)
+                        .frame(height: 461)
+                    
                     VStack {
-
-                        
                         Divider()
                             .padding(.vertical, 10)
-                        
-                        Image(systemName: "sparkle.magnifyingglass")
-                            .font(.title)
-                            .foregroundColor(.gray)
-                            .padding(.bottom, 10)
                         
                         LetterGrid(
                             photoItems: currentPhotos,
@@ -72,27 +58,58 @@ struct Current_challenge: View {
                             selectedPreviewLetter: $selectedPreviewLetter
                         )
                     }
-                    .background(GeometryReader { geo -> Color in
-                        let offset = geo.frame(in: .global).minY
-                        DispatchQueue.main.async {
-                            scrollProgress = -offset / 100
-                        }
-                        return Color.clear
-                    })
+                }
+                .background(GeometryReader { geo -> Color in
+                    let offset = geo.frame(in: .global).minY
+                    DispatchQueue.main.async {
+                        scrollProgress = -offset / 100
+                    }
+                    return Color.clear
+                })
+            }
+            .scrollIndicators(.hidden) // 隐藏滚动条
+            .overlay(alignment: .top) {
+                VStack(spacing: 38) {
+                    Navigation(currentTab: currentTab, onTabChange: onTabChange)
+                    
+                    HStack {
+                        HeadLine(
+                            selectedCollectionId: $selectedCollectionId,
+                            isScrolledPast: scrollProgress > 0.3
+                        )
+                        Spacer()
+                        ProgressBar(currentCollection: currentCollection)
+                    }
+                    .padding(.horizontal)
+                }
+                .background {
+                    Rectangle()
+                        .fill(.white)
+                        .opacity(0.8)
+                        .blur(radius: 20)
+                        .ignoresSafeArea()
+                }
+                .overlay(alignment: .bottom) {
+                    LinearGradient(
+                        colors: [.white.opacity(0.3), .clear],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                    .frame(height: 40)
+                    .offset(y: 20)
                 }
             }
             .sheet(isPresented: $showingCreateCollection) {
                 CreateCollectionView { newId in
-                    selectedCollectionId = newId  // 通过 @Binding 更新 ContentView 中的值
+                    selectedCollectionId = newId
                 }
             }
             .onChange(of: photoCollections) { oldValue, newValue in
-                // 如果是第一次加载collections，自动选择第一个
                 if selectedCollectionId == nil && !newValue.isEmpty {
                     selectedCollectionId = newValue.first?.id
                 }
             }
-            .blur(radius: showingImagePreview ? 3 : 0) // 添加模糊效果
+            .blur(radius: showingImagePreview ? 3 : 0)
             .overlay {
                 ZStack {
                     if showingImagePreview {
@@ -109,7 +126,7 @@ struct Current_challenge: View {
                 }
                 .animation(.spring(response: 0.3, dampingFraction: 0.8), value: showingImagePreview)
             }
-        }  // NavigationStack 结束
+        }
     }
 }
 
@@ -154,6 +171,6 @@ struct CreateCollectionView: View {
 }
 
 #Preview {
-    Current_challenge(selectedCollectionId: .constant(SampleData.collection.id), currentTab: .collection) { _ in }
+    Current_challenge(selectedCollectionId: .constant(SampleData.collection.id), currentTab: .find) { _ in }
         .modelContainer(SampleData.previewContainer)
 }

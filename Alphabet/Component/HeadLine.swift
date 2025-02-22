@@ -19,13 +19,35 @@ struct HeadLine: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 4) {
-                Image(systemName: "magnifyingglass")
-                    .font(.system(size: 20))
-                    .foregroundColor(.gray)
-                Text(isScrolledPast ? "Found alphabet in" : "Unfound alphabet in")
+                if isScrolledPast {
+                    HStack(spacing: 4) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.system(size: 16))
+                            .foregroundColor(.gray)
+                        Text("Found alphabet in")
+                    }
                     .foregroundColor(.gray)
                     .font(.system(size: 16))
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .top).combined(with: .opacity),
+                        removal: .move(edge: .bottom).combined(with: .opacity)
+                    ))
+                } else {
+                    HStack(spacing: 4) {
+                        Image(systemName: "questionmark.circle.fill")
+                            .font(.system(size: 16))
+                            .foregroundColor(.gray)
+                        Text("Unfound alphabet in")
+                    }
+                    .foregroundColor(.gray)
+                    .font(.system(size: 16))
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .top).combined(with: .opacity),
+                        removal: .move(edge: .bottom).combined(with: .opacity)
+                    ))
+                }
             }
+            .animation(.spring(response: 0.3, dampingFraction: 0.8), value: isScrolledPast)
             
             Menu {
                 ForEach(photoCollections) { collection in
