@@ -24,100 +24,96 @@ struct CollectionDetailView: View {
     @State private var selectedPreviewLetter: String = ""
     
     var body: some View {
-        ScrollView {
-            LetterGrid(
-                photoItems: displayedCollection.photos,
-                currentCollection: displayedCollection,
-                showingImagePreview: $showingImagePreview,
-                selectedPreviewPhotos: $selectedPreviewPhotos,
-                selectedPreviewLetter: $selectedPreviewLetter,
-                isStacked: isStacked,
-                showUnfinished: showUnfinished,
-                sortBy: sortBy
-            )
-        }
-        .navigationBarBackButtonHidden(true)  // 隐藏默认的返回按钮
-        .navigationBarTitleDisplayMode(.large)
-        .navigationTitle(displayedCollection.name)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button {
-                    dismiss()
-                } label: {
-                    HStack(spacing: 4) {
-                        Image(systemName: "chevron.left")
-                        Text("Collection")
+        ZStack {
+            ScrollView {
+                LetterGrid(
+                    photoItems: displayedCollection.photos,
+                    currentCollection: displayedCollection,
+                    showingImagePreview: $showingImagePreview,
+                    selectedPreviewPhotos: $selectedPreviewPhotos,
+                    selectedPreviewLetter: $selectedPreviewLetter,
+                    isStacked: isStacked,
+                    showUnfinished: showUnfinished,
+                    sortBy: sortBy
+                )
+            }
+            .navigationBarBackButtonHidden(true)  // 隐藏默认的返回按钮
+            .navigationBarTitleDisplayMode(.large)
+            .navigationTitle(displayedCollection.name)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "chevron.left")
+                            Text("Collection")
+                        }
                     }
                 }
-            }
-            
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Menu {
-                    // 排序选项
-                    Menu("Sort by") {
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Menu {
+                        // 排序选项
+                        Menu("Sort by") {
+                            Button {
+                                sortBy = .time
+                            } label: {
+                                HStack {
+                                    Text("Time")
+                                    if sortBy == .time {
+                                        Image(systemName: "checkmark")
+                                    }
+                                }
+                            }
+                            
+                            Button {
+                                sortBy = .alphabet
+                            } label: {
+                                HStack {
+                                    Text("Alphabet")
+                                    if sortBy == .alphabet {
+                                        Image(systemName: "checkmark")
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // 堆叠选项
                         Button {
-                            sortBy = .time
+                            isStacked.toggle()
                         } label: {
                             HStack {
-                                Text("Time")
-                                if sortBy == .time {
+                                Text(isStacked ? "Unstack" : "Stack")
+                                if isStacked {
                                     Image(systemName: "checkmark")
                                 }
                             }
                         }
                         
+                        // 显示未完成选项
                         Button {
-                            sortBy = .alphabet
+                            showUnfinished.toggle()
                         } label: {
                             HStack {
-                                Text("Alphabet")
-                                if sortBy == .alphabet {
+                                Text(showUnfinished ? "Hide Unfinished" : "Show Unfinished")
+                                if showUnfinished {
                                     Image(systemName: "checkmark")
                                 }
                             }
                         }
-                    }
-                    
-                    // 堆叠选项
-                    Button {
-                        isStacked.toggle()
                     } label: {
-                        HStack {
-                            Text(isStacked ? "Unstack" : "Stack")
-                            if isStacked {
-                                Image(systemName: "checkmark")
-                            }
-                        }
+                        Image(systemName: "ellipsis")
                     }
-                    
-                    // 显示未完成选项
-                    Button {
-                        showUnfinished.toggle()
-                    } label: {
-                        HStack {
-                            Text(showUnfinished ? "Hide Unfinished" : "Show Unfinished")
-                            if showUnfinished {
-                                Image(systemName: "checkmark")
-                            }
-                        }
-                    }
-                } label: {
-                    Image(systemName: "ellipsis")
                 }
             }
         }
-        // 添加图片预览的overlay
-        .blur(radius: showingImagePreview ? 3 : 0)
-        .overlay {
-            if showingImagePreview {
-                ImagePreviewer(
-                    photos: selectedPreviewPhotos,
-                    selectedLetter: selectedPreviewLetter,
-                    isPresented: $showingImagePreview
-                )
-                .ignoresSafeArea()
-                .zIndex(1)
-            }
+        .navigationDestination(isPresented: $showingImagePreview) {
+            ImagePreviewer(
+                photos: selectedPreviewPhotos,
+                selectedLetter: selectedPreviewLetter,
+                isPresented: $showingImagePreview
+            )
         }
     }
 }

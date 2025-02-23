@@ -34,6 +34,7 @@ struct Current_challenge: View {
     }
     
     var body: some View {
+        ZStack {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 0) {
@@ -113,7 +114,10 @@ struct Current_challenge: View {
                 }
             }
             .blur(radius: showingImagePreview ? 3 : 0)
-            .overlay {
+            
+        }
+        }
+         .overlay {
                 ZStack {
                     if showingImagePreview {
                         ImagePreviewer(
@@ -122,14 +126,13 @@ struct Current_challenge: View {
                             isPresented: $showingImagePreview
                         )
                         .transition(.asymmetric(
-                            insertion: .opacity.combined(with: .scale(scale: 5)),
+                            insertion: .opacity.combined(with: .scale(scale: 0.9)),
                             removal: .opacity.combined(with: .scale(scale: 0.9))
                         ))
                     }
                 }
                 .animation(.spring(response: 0.3, dampingFraction: 0.8), value: showingImagePreview)
             }
-        }
     }
 }
 

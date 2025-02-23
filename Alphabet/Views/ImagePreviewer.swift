@@ -4,64 +4,119 @@ struct ImagePreviewer: View {
     var photos: [PhotoItem] // 传入的照片数组
     var selectedLetter: String // 当前字母
     var isPresented: Binding<Bool>
-
+    
+    @State private var offset: CGSize = .zero
+    @State private var opacity: Double = 1.0
+    @State private var scale: CGFloat = 1.0
+    
+    private func calculateDismissProgress(_ translation: CGSize) -> CGFloat {
+        let progress = sqrt(
+            pow(translation.height, 2) + 
+            pow(translation.width, 2)
+        ) / UIScreen.main.bounds.height
+        return min(max(progress, 0), 1)
+    }
+    
     var body: some View {
-        GeometryReader { geometry in
-            Color.clear // 透明背景用于检测点击
-                .contentShape(Rectangle()) // 使整个区域可点击
-                .onTapGesture {
+        VStack(spacing: 0) {
+            // 顶部导航栏
+            HStack {
+                Button {
                     isPresented.wrappedValue = false
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 20))
+                        .foregroundColor(.black)
                 }
-                .overlay {
-                    VStack {
-                        // 顶部导航栏
-                        HStack {
-                            Button(action: {
-                                isPresented.wrappedValue = false
-                            }) {
-                                Image(systemName: "xmark")
-                                    .foregroundColor(.black) // 改为黑色
-                                    .padding()
-                            }
-                            
-                            Spacer()
-                            
-                            Text(selectedLetter)
-                                .foregroundColor(.black) // 改为黑色
-                                .font(.title2)
-                            
-                            Spacer()
-                            
-                            // 为了保持对称添加一个占位视图
-                            Color.clear
-                                .frame(width: 44, height: 44)
-                        }
-                        .padding(.top, 20)
-                        .background(Color.white.opacity(0.5)) // 半透明白色背景
-                        
-                        // 照片展示区域
-                        TabView {
-                            ForEach(photos, id: \.id) { photo in
-                                if let uiImage = UIImage(data: photo.imageData) {
-                                    Image(uiImage: uiImage)
-                                        .resizable()
-                                        .scaledToFit()
-                                        .padding()
-                                        .contentShape(Rectangle())
-                                        .allowsHitTesting(false) // 禁止照片区域的点击事件
-                                }
-                            }
-                        }
-                        .tabViewStyle(PageTabViewStyle())
+                
+                Spacer()
+                
+                Text("TFL")
+                    .font(.system(size: 12))
+                    .foregroundColor(.gray)
+                
+                Text(selectedLetter)
+                    .font(.system(size: 32))
+                    .fontWeight(.medium)
+                
+                Spacer()
+            }
+            .padding(.horizontal)
+            .padding(.top, 8)
+            .padding(.bottom, 16)
+            
+            // 图片展示区域
+            TabView {
+                ForEach(photos, id: \.id) { photo in
+                    if let uiImage = UIImage(data: photo.imageData) {
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .scaledToFit()
+                            .padding()
                     }
-                    .frame(width: geometry.size.width * 0.9)
-                    .background(Color.white.opacity(0.7)) // 主要内容区域的半透明白色背景
-                    .cornerRadius(20)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
+            }
+            .tabViewStyle(PageTabViewStyle())
+            
+            // 底部工具栏
+            HStack(spacing: 40) {
+                Button {
+                    // 上传功能
+                } label: {
+                    Image(systemName: "arrow.up.circle.fill")
+                        .font(.system(size: 32))
+                        .foregroundColor(.gray)
+                }
+                
+                Button {
+                    // 删除功能
+                } label: {
+                    Image(systemName: "trash.circle.fill")
+                        .font(.system(size: 32))
+                        .foregroundColor(.gray)
+                }
+            }
+            .padding(.vertical, 20)
         }
-        .background(Color.white.opacity(0.5)) // 整体的半透明白色背景
+        .background(Color.white)
+        .offset(x: offset.width, y: offset.height)
+        .scaleEffect(scale)
+        .opacity(opacity)
+        .gesture(
+            DragGesture()
+                .onChanged { gesture in
+                    let translation = gesture.translation
+                    offset = translation
+                    
+                    let progress = calculateDismissProgress(translation)
+                    opacity = 1.0 - progress * 0.5
+                    scale = 1.0 - progress * 0.2
+                }
+                .onEnded { gesture in
+                    let translation = gesture.translation
+                    let progress = calculateDismissProgress(translation)
+                    let velocity = gesture.predictedEndLocation.y - gesture.location.y
+                    
+                    if progress > 0.25 || abs(velocity) > 1000 {
+                        withAnimation(.easeOut(duration: 0.2)) {
+                            let velocityMultiplier: CGFloat = 0.5
+                            offset.width += gesture.velocity.width * velocityMultiplier
+                            offset.height += gesture.velocity.height * velocityMultiplier
+                            opacity = 0
+                            scale = 0.5
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                            isPresented.wrappedValue = false
+                        }
+                    } else {
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                            offset = .zero
+                            opacity = 1.0
+                            scale = 1.0
+                        }
+                    }
+                }
+        )
         .ignoresSafeArea()
-        .transition(.opacity)
     }
 }
