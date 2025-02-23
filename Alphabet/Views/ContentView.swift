@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var selectedTab: Tab = .collection
+    @State private var selectedTab: Tab = .find
     @State private var selectedCollectionId: UUID? = SampleData.collection.id
     
     var body: some View {
