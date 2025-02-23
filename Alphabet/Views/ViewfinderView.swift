@@ -165,7 +165,7 @@ struct ViewfinderView: View {
     }
 }
 
-#Preview {
-    ViewfinderView(selectedLetter: "A")
-}
-
+//#Preview {
+//    ViewfinderView(selectedLetter: "A")
+//}
+//

@@ -117,11 +117,11 @@ struct CollectionDetailView: View {
         }
     }
 }
-
-#Preview {
-    NavigationStack {
-        CollectionDetailView(displayedCollection: SampleData.collection)
-    }
-    .modelContainer(SampleData.previewContainer)
-}
-
+//
+//#Preview {
+//    NavigationStack {
+//        CollectionDetailView(displayedCollection: SampleData.collection)
+//    }
+//    .modelContainer(SampleData.previewContainer)
+//}
+//

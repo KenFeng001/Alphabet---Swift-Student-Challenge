@@ -176,7 +176,7 @@ struct CreateCollectionView: View {
     }
 }
 
-#Preview {
-    Current_challenge(selectedCollectionId: .constant(SampleData.collection.id), currentTab: .find) { _ in }
-        .modelContainer(SampleData.previewContainer)
-}
+//#Preview {
+//    Current_challenge(selectedCollectionId: .constant(SampleData.collection.id), currentTab: .find) { _ in }
+//        .modelContainer(SampleData.previewContainer)
+//}
