@@ -9,6 +9,7 @@ struct Card: View {
     @State private var isBackdropVisible = false
     @State private var isTextVisible = false
     @State private var randomQuote: MotivationalQuote
+    @State private var selectedBackdrop: Int
     
     init(title: String, description: String, photoItems: [PhotoItem], currentCollection: PhotoCollection?) {
         self.title = title
@@ -16,6 +17,7 @@ struct Card: View {
         self.photoItems = photoItems
         self.currentCollection = currentCollection
         _randomQuote = State(initialValue: quotes.randomElement() ?? MotivationalQuote(quote: "Look at the world differently.", author: "Unknown"))
+        _selectedBackdrop = State(initialValue: Int.random(in: 0...8))
     }
     
     var body: some View {
@@ -42,7 +44,7 @@ struct Card: View {
                     .scaledToFill()
                     .frame(width: 337, height: 449)
                 
-                VStack(spacing: 8) {
+                VStack(spacing: 0) {
                     VStack {
                         Image(systemName: "eyes")
                         Text("Looking for")
@@ -50,7 +52,7 @@ struct Card: View {
                     }
                     
                     ZStack {
-                        Image("letterbackdrop")
+                        Image("LetterBackDrop-\(selectedBackdrop)")
                             .resizable()
                             .scaledToFit()
                             .frame(width: 200)
@@ -89,14 +91,13 @@ struct Card: View {
                         }
                     }
                     .padding(.leading, 140)
-                    .padding(.top, 14)
+                    .padding(.top, 30)
 
                 }
             }
             .frame(width: 349, height: 461)
             .clipped()
             .cornerRadius(20)
-            // .shadow(radius: 10)
             .onAppear {
                 // 背景动画
                 withAnimation(.easeOut(duration: 0.6)) {

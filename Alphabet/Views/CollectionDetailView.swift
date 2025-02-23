@@ -13,10 +13,12 @@ import Foundation  // 如果需要的话
 
 struct CollectionDetailView: View {
     @Environment(\.dismiss) private var dismiss  // 添加 dismiss 环境变量
+    @Environment(\.modelContext) private var modelContext  // 添加 modelContext
     var displayedCollection: PhotoCollection
     @State private var sortBy: SortOption = .time
     @State private var isStacked: Bool = true
     @State private var showUnfinished: Bool = true
+    @State private var showingDeleteAlert = false  // 添加删除确认提示状态
     
     // 添加图片预览所需的状态
     @State private var showingImagePreview = false
@@ -102,10 +104,27 @@ struct CollectionDetailView: View {
                                 }
                             }
                         }
+                        
+                        Divider()  // 添加分隔线
+                        
+                        // 添加删除选项
+                        Button(role: .destructive) {  // 使用 destructive 角色使其显示为红色
+                            showingDeleteAlert = true
+                        } label: {
+                            Label("删除集合", systemImage: "trash")
+                        }
                     } label: {
                         Image(systemName: "ellipsis")
                     }
                 }
+            }
+            .alert("确认删除", isPresented: $showingDeleteAlert) {
+                Button("取消", role: .cancel) { }
+                Button("删除", role: .destructive) {
+                    deleteCollection()
+                }
+            } message: {
+                Text("确定要删除这个集合吗？此操作无法撤销。")
             }
         }
         .navigationDestination(isPresented: $showingImagePreview) {
@@ -115,6 +134,12 @@ struct CollectionDetailView: View {
                 isPresented: $showingImagePreview
             )
         }
+    }
+    
+    // 添加删除方法
+    private func deleteCollection() {
+        modelContext.delete(displayedCollection)
+        dismiss()  // 删除后返回上一页
     }
 }
 

@@ -73,7 +73,7 @@ struct Current_challenge: View {
             }
             .scrollIndicators(.hidden) // 隐藏滚动条
             .overlay(alignment: .top) {
-                VStack(spacing: 38) {
+                VStack(spacing: 20) {
                     Navigation(currentTab: currentTab, onTabChange: onTabChange)
                     
                     HStack {
@@ -86,6 +86,7 @@ struct Current_challenge: View {
                     }
                     .padding(.horizontal)
                 }
+                .padding(.horizontal, 16)
                 .background {
                     Rectangle()
                         .fill(.white)
@@ -95,7 +96,7 @@ struct Current_challenge: View {
                 }
                 .overlay(alignment: .bottom) {
                     LinearGradient(
-                        colors: [.white.opacity(0.3), .clear],
+                        colors: [.white.opacity(0), .clear],
                         startPoint: .top,
                         endPoint: .bottom
                     )
