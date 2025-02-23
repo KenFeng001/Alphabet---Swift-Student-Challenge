@@ -187,10 +187,10 @@ struct ImagePreviewer: View {
     }
 }
 
-#Preview {
-    ImagePreviewer(
-        photos: SampleData.photos,
-        selectedLetter: "A",
-        isPresented: .constant(true)
-    )
-}
+//#Preview {
+//    ImagePreviewer(
+//        photos: SampleData.photos,
+//        selectedLetter: "A",
+//        isPresented: .constant(true)
+//    )
+//}
