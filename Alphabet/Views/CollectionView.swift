@@ -29,7 +29,7 @@ struct CollectionView: View {
     }
 }
 
-//#Preview {
-//    CollectionView(currentTab: .collection, onTabChange: { _ in })
-//        .modelContainer(SampleData.previewContainer)
-//}
+#Preview {
+    CollectionView(currentTab: .collection, onTabChange: { _ in })
+        .modelContainer(SampleData.previewContainer)
+}

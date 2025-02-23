@@ -103,11 +103,11 @@ extension Image {
 }
 
 // 添加预览
-//#Preview {
-//    ViewfinderImagePreview(
-//        thumbNailImage: Image("Y"),
-//        imageData: Data(), // 使用空的 Data 作为预览
-//        selectedLetter: "A",
-//        currentCollection: nil
-//    )
-//}
+#Preview {
+    ViewfinderImagePreview(
+        thumbNailImage: Image("Y"),
+        imageData: Data(), // 使用空的 Data 作为预览
+        selectedLetter: "A",
+        currentCollection: nil
+    )
+}

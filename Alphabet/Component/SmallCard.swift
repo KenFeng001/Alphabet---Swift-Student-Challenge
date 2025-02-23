@@ -68,7 +68,7 @@ struct SmallCard: View {
                         }
                     }
                     .onTapGesture {
-                        selectedPreviewPhotos = isStacked ? letterPhotos : photoItems
+                        selectedPreviewPhotos = letterPhotos
                         selectedPreviewLetter = letter
                         showingImagePreview = true
                     }
