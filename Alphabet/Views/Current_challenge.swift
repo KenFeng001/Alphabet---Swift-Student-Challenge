@@ -35,73 +35,115 @@ struct Current_challenge: View {
     
     var body: some View {
         ZStack {
-        NavigationStack {
-            ScrollView {
-                VStack(spacing: 0) {
-                    // 添加一个空的视图来抵消顶部空间
-                    Color.clear
-                        .frame(height: 140) // Navigation + HeadLine + spacing的总高度
-                    
-                    SlidingCards(photoItems: currentPhotos, 
-                               currentCollection: currentCollection, 
-                               uncollectedLetters: uncollectedLetters)
-                        .frame(height: 461)
-                    
-                    VStack {
-                        Divider()
-                            .padding(.vertical, 10)
-                        
-                        LetterGrid(
-                            photoItems: currentPhotos,
-                            currentCollection: currentCollection,
-                            showingImagePreview: $showingImagePreview,
-                            selectedPreviewPhotos: $selectedPreviewPhotos,
-                            selectedPreviewLetter: $selectedPreviewLetter,
-                            isStacked: true,  // Current_challenge 中总是堆叠显示
-                            showUnfinished: true,  // Current_challenge 中总是显示未完成项
-                            sortBy: .alphabet  // Current_challenge 中按字母顺序排序
-                        )
-                    }
-                }
-                .background(GeometryReader { geo -> Color in
-                    let offset = geo.frame(in: .global).minY
-                    DispatchQueue.main.async {
-                        scrollProgress = -offset / 100
-                    }
-                    return Color.clear
-                })
-            }
-            .scrollIndicators(.hidden) // 隐藏滚动条
-            .overlay(alignment: .top) {
-                VStack(spacing: 20) {
-                    Navigation(currentTab: currentTab, onTabChange: onTabChange)
-                    
-                    HStack {
-                        HeadLine(
-                            selectedCollectionId: $selectedCollectionId,
-                            isScrolledPast: scrollProgress > 0.3
-                        )
+            NavigationStack {
+                if photoCollections.isEmpty {
+                    VStack(spacing: 0) {
+                        Color.clear
+                            .frame(height: 60)
                         Spacer()
-                        ProgressBar(currentCollection: currentCollection)
+                        Button(action: {
+                            showingCreateCollection = true
+                        }) {
+                            VStack(spacing: 12) {
+                                Image(systemName: "plus.circle.fill")
+                                    .font(.system(size: 60))
+                                Text("创建你的第一个集合")
+                                    .font(.system(size: 20, weight: .medium))
+                            }
+                            .foregroundColor(.gray)
+                        }
+                        Spacer()
                     }
-                    .padding(.horizontal)
-                }
-                .padding(.horizontal, 16)
-                .background {
-                    Rectangle()
-                        .fill(.white)
-                        .opacity(0.8)
-                        .blur(radius: 20)
-                        .ignoresSafeArea()
-                }
-                .overlay(alignment: .bottom) {
-                    LinearGradient(
-                        colors: [.white.opacity(0), .clear],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                    .frame(height: 40)
-                    .offset(y: 20)
+                    .overlay(alignment: .top) {
+                        VStack(spacing: 20) {
+                            Navigation(currentTab: currentTab, onTabChange: onTabChange)
+                                .padding(.horizontal, 16)
+                            Color.clear
+                                .frame(height: 60)
+                        }
+                        .background {
+                            Rectangle()
+                                .fill(.white)
+                                .opacity(0.8)
+                                .blur(radius: 20)
+                                .ignoresSafeArea()
+                        }
+                    }
+                } else {
+                    ScrollView {
+                        VStack(spacing: 0) {
+                            Color.clear
+                                .frame(height: 140) // Navigation + HeadLine + spacing的总高度
+                            
+                            SlidingCards(photoItems: currentPhotos, 
+                                       currentCollection: currentCollection, 
+                                       uncollectedLetters: uncollectedLetters)
+                                .frame(height: 461)
+                            
+                            VStack {
+                                Divider()
+                                    .padding(.vertical, 10)
+                                
+                                LetterGrid(
+                                    photoItems: currentPhotos,
+                                    currentCollection: currentCollection,
+                                    showingImagePreview: $showingImagePreview,
+                                    selectedPreviewPhotos: $selectedPreviewPhotos,
+                                    selectedPreviewLetter: $selectedPreviewLetter,
+                                    isStacked: true,  // Current_challenge 中总是堆叠显示
+                                    showUnfinished: true,  // Current_challenge 中总是显示未完成项
+                                    sortBy: .alphabet  // Current_challenge 中按字母顺序排序
+                                )
+                            }
+                        }
+                        .background(GeometryReader { geo -> Color in
+                            let offset = geo.frame(in: .global).minY
+                            DispatchQueue.main.async {
+                                scrollProgress = -offset / 100
+                            }
+                            return Color.clear
+                        })
+                    }
+                    .scrollIndicators(.hidden) // 隐藏滚动条
+                    .overlay(alignment: .top) {
+                        VStack(spacing: 20) {
+                            Navigation(currentTab: currentTab, onTabChange: onTabChange)
+                                .background {
+                                    Rectangle()
+                                        .fill(.white)
+                                        .opacity(0.8)
+                                        .blur(radius: 20)
+                                        .ignoresSafeArea()
+                                }
+                            
+                            HStack {
+                                HeadLine(
+                                    selectedCollectionId: $selectedCollectionId,
+                                    isScrolledPast: scrollProgress > 0.3
+                                )
+                                Spacer()
+                                ProgressBar(currentCollection: currentCollection)
+                            }
+                            .padding(.horizontal)
+                        }
+                        .padding(.horizontal, 16)
+                        .background {
+                            Rectangle()
+                                .fill(.white)
+                                .opacity(0.8)
+                                .blur(radius: 20)
+                                .ignoresSafeArea()
+                        }
+                        .overlay(alignment: .bottom) {
+                            LinearGradient(
+                                colors: [.white.opacity(0), .clear],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                            .frame(height: 40)
+                            .offset(y: 20)
+                        }
+                    }
                 }
             }
             .sheet(isPresented: $showingCreateCollection) {
@@ -115,25 +157,23 @@ struct Current_challenge: View {
                 }
             }
             .blur(radius: showingImagePreview ? 3 : 0)
-            
         }
-        }
-         .overlay {
-                ZStack {
-                    if showingImagePreview {
-                        ImagePreviewer(
-                            photos: selectedPreviewPhotos,
-                            selectedLetter: selectedPreviewLetter,
-                            isPresented: $showingImagePreview
-                        )
-                        .transition(.asymmetric(
-                            insertion: .opacity.combined(with: .scale(scale: 0.9)),
-                            removal: .opacity.combined(with: .scale(scale: 0.9))
-                        ))
-                    }
+        .overlay {
+            ZStack {
+                if showingImagePreview {
+                    ImagePreviewer(
+                        photos: selectedPreviewPhotos,
+                        selectedLetter: selectedPreviewLetter,
+                        isPresented: $showingImagePreview
+                    )
+                    .transition(.asymmetric(
+                        insertion: .opacity.combined(with: .scale(scale: 0.9)),
+                        removal: .opacity.combined(with: .scale(scale: 0.9))
+                    ))
                 }
-                .animation(.spring(response: 0.3, dampingFraction: 0.8), value: showingImagePreview)
             }
+            .animation(.spring(response: 0.3, dampingFraction: 0.8), value: showingImagePreview)
+        }
     }
 }
 

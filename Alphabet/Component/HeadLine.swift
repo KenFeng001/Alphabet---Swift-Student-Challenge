@@ -13,7 +13,7 @@ struct HeadLine: View {
            let collection = photoCollections.first(where: { $0.id == selectedId }) {
             return collection.name
         }
-        return SampleData.collection.name
+        return "Empty"
     }
     
     var body: some View {
@@ -49,27 +49,43 @@ struct HeadLine: View {
             }
             .animation(.spring(response: 0.3, dampingFraction: 0.8), value: isScrolledPast)
             
-            Menu {
-                ForEach(photoCollections) { collection in
-                    Button(collection.name) {
-                        selectedCollectionId = collection.id
-                    }
-                }
-                
-                Divider()
-                
+            if photoCollections.isEmpty {
                 Button(action: {
                     showingCreateCollection = true
                 }) {
-                    Label("创建新集合", systemImage: "plus.circle")
-                }   
-            } label: {
-                HStack {
-                    Text(currentCollectionName)
-                        .font(.system(size: 32, weight: .bold))
-                        .foregroundColor(.black)
-                    Image(systemName: "chevron.down")
-                        .font(.system(size: 20))
+                    HStack {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.system(size: 32))
+                        Text("创建集合")
+                            .font(.system(size: 32, weight: .bold))
+                    }
+                    .foregroundColor(.gray)
+                }
+            } else {
+                Menu {
+                    ForEach(photoCollections) { collection in
+                        Button(collection.name) {
+                            selectedCollectionId = collection.id
+                        }
+                    }
+                    
+                    Divider()
+                    
+                    Button(action: {
+                        showingCreateCollection = true
+                    }) {
+                        Label("创建新集合", systemImage: "plus.circle")
+                    }   
+                } label: {
+                    HStack {
+                        Text(currentCollectionName)
+                            .font(.system(size: 32, weight: .bold))
+                            .foregroundColor(.black)
+                            .minimumScaleFactor(0.5)
+                            .lineLimit(1)
+                        Image(systemName: "chevron.down")
+                            .font(.system(size: 20))
+                    }
                 }
             }
         }

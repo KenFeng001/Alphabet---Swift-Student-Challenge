@@ -34,6 +34,7 @@ struct CollectionView: View {
             }
             .overlay(alignment: .top) {
                 Navigation(currentTab: currentTab, onTabChange: onTabChange)
+                    .padding(.horizontal, 16)
                     .background {
                         Rectangle()
                             .fill(.white)
@@ -49,6 +50,7 @@ struct CollectionView: View {
                         )
                         .frame(height: 40)
                         .offset(y: 20)
+                        .padding(.horizontal, 16)
                     }
             }
         }
