@@ -13,7 +13,7 @@ struct ViewfinderImagePreview: View {
     var body: some View {
         VStack(spacing: 0) {
             // 顶部字母显示
-            Text("\(selectedLetter);\(selectedLetter.lowercased())")
+            Text("\(selectedLetter);f")
                 .font(.system(size: 48, weight: .bold))
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -37,7 +37,7 @@ struct ViewfinderImagePreview: View {
                 }) {
                     Circle()
                         .fill(Color.white.opacity(0.2))
-                        .frame(width: 70, height: 70)
+                        .frame(width: 44, height: 44)
                         .overlay(
                             Image(systemName: "chevron.left")
                                 .font(.system(size: 20))
@@ -55,14 +55,12 @@ struct ViewfinderImagePreview: View {
                     presentationMode.wrappedValue.dismiss()
                 }) {
                     Text("Saved to \(selectedLetter)")
-                        .font(Font.custom("SF Pro", size: 22))
+                        .font(.system(size: 16, weight: .medium))
                         .foregroundColor(.white)
-                        .padding(.horizontal, 61)
-                        .padding(.vertical, 21)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 12)
                         .background(Color.white.opacity(0.2))
                         .cornerRadius(22)
-                        .multilineTextAlignment(.center)
-
                 }
             }
             .padding(.horizontal, 20)

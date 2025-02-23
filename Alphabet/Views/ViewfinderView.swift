@@ -18,12 +18,9 @@ struct ViewfinderView: View {
         NavigationStack {
             VStack(spacing: 30) {
                 // 顶部当前选中的字母显示
-            Text("\(selectedLetter);\(selectedLetter.lowercased())")
-                .font(.system(size: 48, weight: .bold))
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 40)
-                .padding(.top, 40)    
+                Text(selectedLetter)
+                    .font(.system(size: 48, weight: .bold))
+                    .foregroundColor(.white)                
                 
                 // 相机预览
                 if let image = model.viewfinderImage {
@@ -50,7 +47,7 @@ struct ViewfinderView: View {
                     }) {
                         Circle()
                             .fill(Color.white.opacity(0.2))
-                            .frame(width: 60, height: 60)
+                            .frame(width: 44, height: 44)
                             .overlay(
                                 Image(systemName: "chevron.left")
                                     .font(.system(size: 20))
@@ -66,7 +63,7 @@ struct ViewfinderView: View {
                     }) {
                         Circle()
                             .stroke(Color.white, lineWidth: 3)
-                            .frame(width: 70, height: 70)
+                            .frame(width: 65, height: 65)
                             .background(Circle().fill(Color.white.opacity(0.2)))
                     }
                     .background(navigationLink)
@@ -78,7 +75,7 @@ struct ViewfinderView: View {
                     }) {
                         Circle()
                             .fill(Color.white.opacity(0.2))
-                            .frame(width: 60, height: 60)
+                            .frame(width: 44, height: 44)
                             .overlay(
                                 Text(zoomText)
                                     .foregroundColor(.white)

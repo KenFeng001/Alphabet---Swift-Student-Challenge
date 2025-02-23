@@ -86,7 +86,7 @@ struct LetterGrid: View {
                     ForEach(processedPhotos.indices, id: \.self) { photoIndex in
                         SmallCard(
                             letter: letter,
-                            photoItems: isStacked ? photoItems : processedPhotos[photoIndex],
+                            photoItems: processedPhotos[photoIndex],
                             showingImagePreview: $showingImagePreview,
                             selectedPreviewPhotos: $selectedPreviewPhotos,
                             selectedPreviewLetter: $selectedPreviewLetter,
