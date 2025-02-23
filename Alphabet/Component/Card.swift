@@ -2,8 +2,6 @@ import SwiftUI
 
 struct Card: View {
     var title: String
-    var description: String
-    var photoItems: [PhotoItem]
     var currentCollection: PhotoCollection?  // 添加 currentCollection 参数
     @State private var isLetterVisible = false
     @State private var isBackdropVisible = false
@@ -11,33 +9,14 @@ struct Card: View {
     @State private var randomQuote: MotivationalQuote
     @State private var selectedBackdrop: Int
     
-    init(title: String, description: String, photoItems: [PhotoItem], currentCollection: PhotoCollection?) {
+    init(title: String, currentCollection: PhotoCollection?) {
         self.title = title
-        self.description = description
-        self.photoItems = photoItems
         self.currentCollection = currentCollection
         _randomQuote = State(initialValue: quotes.randomElement() ?? MotivationalQuote(quote: "Look at the world differently.", author: "Unknown"))
         _selectedBackdrop = State(initialValue: Int.random(in: 0...8))
     }
     
     var body: some View {
-        if let latestItem = photoItems
-            .filter({ $0.letter == title })
-            .sorted(by: { $0.timestamp > $1.timestamp })
-            .first,
-           let uiImage = UIImage(data: latestItem.imageData) {
-            // 有照片的情况保持不变
-            ZStack {
-                Image(uiImage: uiImage)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 337, height: 449)
-            }
-            .clipped()
-            .cornerRadius(20)
-            .shadow(radius: 10)
-        } else {
-            // 没有照片的情况
             ZStack {
                 Image("cardbackground")
                     .resizable()
@@ -46,7 +25,7 @@ struct Card: View {
                 
                 VStack(spacing: 0) {
                     VStack {
-                        Image(systemName: "eyes")
+                        
                         Text("Looking for")
                             .font(.system(size: 24))
                     }
@@ -122,4 +101,4 @@ struct Card: View {
             }
         }
     }
-}
+

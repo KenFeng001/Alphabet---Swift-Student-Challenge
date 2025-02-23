@@ -11,8 +11,6 @@ struct SlidingCards: View {
                 ForEach(uncollectedLetters, id: \.self) { letter in
                     Card(
                         title: letter,
-                        description: "This is the letter \(letter)",
-                        photoItems: photoItems,
                         currentCollection: currentCollection
                     )
                     .scrollTransition(.animated) { content, phase in
