@@ -29,3 +29,7 @@ struct SlidingCards: View {
         .scrollTargetBehavior(.viewAligned)
     }
 } 
+
+#Preview {
+    SlidingCards(photoItems: SampleData.photos, currentCollection: SampleData.collection, uncollectedLetters: ["A", "B", "C"])
+}
