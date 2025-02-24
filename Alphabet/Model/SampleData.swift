@@ -8,19 +8,19 @@ struct SampleData {
     )
     
     static let photos = [
-        PhotoItem(letter: "A", imageData: UIImage(named: "A_TFL")?.jpegData(compressionQuality: 0.8) ?? Data(), collection: collection),
-        PhotoItem(letter: "B", imageData: UIImage(named: "B_TFL")?.jpegData(compressionQuality: 0.8) ?? Data(), collection: collection),
-        PhotoItem(letter: "D", imageData: UIImage(named: "D_TFL")?.jpegData(compressionQuality: 0.8) ?? Data(), collection: collection),
-        PhotoItem(letter: "H", imageData: UIImage(named: "H_TFL")?.jpegData(compressionQuality: 0.8) ?? Data(), collection: collection),
-        PhotoItem(letter: "I", imageData: UIImage(named: "IMG_6239")?.jpegData(compressionQuality: 0.8) ?? Data(), collection: collection),
+        PhotoItem(letter: "A", imageData: UIImage(named: "A_TFL")?.jpegData(compressionQuality: 0.8) ?? Data(), collection: collection, isPinned: true),
+        PhotoItem(letter: "B", imageData: UIImage(named: "B_TFL")?.jpegData(compressionQuality: 0.8) ?? Data(), collection: collection, isPinned: true),
+        PhotoItem(letter: "D", imageData: UIImage(named: "D_TFL")?.jpegData(compressionQuality: 0.8) ?? Data(), collection: collection, isPinned: true),
+        PhotoItem(letter: "H", imageData: UIImage(named: "H_TFL")?.jpegData(compressionQuality: 0.8) ?? Data(), collection: collection, isPinned: true),
+        PhotoItem(letter: "L", imageData: UIImage(named: "IMG_6239")?.jpegData(compressionQuality: 0.8) ?? Data(), collection: collection, isPinned: true),
         PhotoItem(letter: "L", imageData: UIImage(named: "L_TFL")?.jpegData(compressionQuality: 0.8) ?? Data(), collection: collection),
-        PhotoItem(letter: "M", imageData: UIImage(named: "M_TFL")?.jpegData(compressionQuality: 0.8) ?? Data(), collection: collection),
-        PhotoItem(letter: "T", imageData: UIImage(named: "T_TFL")?.jpegData(compressionQuality: 0.8) ?? Data(), collection: collection),
-        PhotoItem(letter: "V", imageData: UIImage(named: "V_TFL")?.jpegData(compressionQuality: 0.8) ?? Data(), collection: collection),
-        PhotoItem(letter: "W", imageData: UIImage(named: "W_TFL")?.jpegData(compressionQuality: 0.8) ?? Data(), collection: collection),
-        PhotoItem(letter: "X", imageData: UIImage(named: "X_TFL")?.jpegData(compressionQuality: 0.8) ?? Data(), collection: collection),
-        PhotoItem(letter: "Y", imageData: UIImage(named: "Y_TFL")?.jpegData(compressionQuality: 0.8) ?? Data(), collection: collection),
-        PhotoItem(letter: "Z", imageData: UIImage(named: "Z_TFL")?.jpegData(compressionQuality: 0.8) ?? Data(), collection: collection)
+        PhotoItem(letter: "M", imageData: UIImage(named: "M_TFL")?.jpegData(compressionQuality: 0.8) ?? Data(), collection: collection, isPinned: true),
+        PhotoItem(letter: "T", imageData: UIImage(named: "T_TFL")?.jpegData(compressionQuality: 0.8) ?? Data(), collection: collection, isPinned: true),
+        PhotoItem(letter: "V", imageData: UIImage(named: "V_TFL")?.jpegData(compressionQuality: 0.8) ?? Data(), collection: collection, isPinned: true),
+        PhotoItem(letter: "W", imageData: UIImage(named: "W_TFL")?.jpegData(compressionQuality: 0.8) ?? Data(), collection: collection, isPinned: true),
+        PhotoItem(letter: "X", imageData: UIImage(named: "X_TFL")?.jpegData(compressionQuality: 0.8) ?? Data(), collection: collection, isPinned: true),
+        PhotoItem(letter: "Y", imageData: UIImage(named: "Y_TFL")?.jpegData(compressionQuality: 0.8) ?? Data(), collection: collection, isPinned: true),
+        PhotoItem(letter: "Z", imageData: UIImage(named: "Z_TFL")?.jpegData(compressionQuality: 0.8) ?? Data(), collection: collection, isPinned: true)
     ]
     
     @MainActor
@@ -47,7 +47,7 @@ struct SampleData2 {
                 letter: String(letter),
                 imageData: UIImage(named: imageName)?.jpegData(compressionQuality: 0.8) ?? Data(),
                 collection: collection,
-                isPinned: false
+                isPinned: true
             )
         }
     }()
@@ -58,6 +58,23 @@ struct SampleData2 {
         let container = try! ModelContainer(for: PhotoItem.self, PhotoCollection.self, configurations: config)
         container.mainContext.insert(collection)
         photos.forEach { container.mainContext.insert($0) }
+        return container
+    }()
+}
+
+struct SampleData0 {
+    static let collection = PhotoCollection(
+        name: "Starter",
+        expectedEndDate: Date().addingTimeInterval(30 * 24 * 3600)
+    )
+    
+    static let photos: [PhotoItem] = []
+    
+    @MainActor
+    static var previewContainer: ModelContainer = {
+        let config = ModelConfiguration(isStoredInMemoryOnly: true)
+        let container = try! ModelContainer(for: PhotoItem.self, PhotoCollection.self, configurations: config)
+        container.mainContext.insert(collection)
         return container
     }()
 }

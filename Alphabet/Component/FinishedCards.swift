@@ -7,6 +7,8 @@ struct FinishedCards: View {
     @State private var showingSaveAlert = false
     @State private var exportImage: UIImage?
     @State private var showingPreview = false
+    @State private var showCelebration = false
+    @State private var showText = false
     
     var body: some View {
         ZStack {
@@ -28,11 +30,18 @@ struct FinishedCards: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 200)
+                        .scaleEffect(showCelebration ? 1 : 0.5)
+                        .rotationEffect(.degrees(showCelebration ? 0 : -180))
+                        .opacity(showCelebration ? 1 : 0)
+                        .animation(.spring(response: 0.6, dampingFraction: 0.6, blendDuration: 0), value: showCelebration)
                     
                     Text("You have found all the letters!")
                         .font(.system(size: 50, weight: .bold))
                         .foregroundColor(.black)
                         .multilineTextAlignment(.center)
+                        .scaleEffect(showText ? 1 : 0.5)
+                        .opacity(showText ? 1 : 0)
+                        .animation(.spring(response: 0.6, dampingFraction: 0.7, blendDuration: 0).delay(0.3), value: showText)
                 }
                 
                 HStack {
@@ -60,6 +69,10 @@ struct FinishedCards: View {
         .frame(width: 349, height: 461)
         .clipped()
         .cornerRadius(20)
+        .onAppear {
+            showCelebration = true
+            showText = true
+        }
         .sheet(isPresented: $showingPreview) {
             if let image = exportImage {
                 NavigationStack {

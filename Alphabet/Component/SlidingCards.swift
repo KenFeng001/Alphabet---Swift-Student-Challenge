@@ -10,7 +10,7 @@ struct SlidingCards: View {
             if uncollectedLetters.isEmpty {
                 if let collection = currentCollection {
                     FinishedCards(currentCollection: collection)
-                        .padding(.horizontal, 16)
+                        .padding(.horizontal, 25)
                 } else {
                     Text("No collection available.")
                 }
@@ -38,5 +38,5 @@ struct SlidingCards: View {
 } 
 
 #Preview {
-    SlidingCards(photoItems: SampleData.photos, currentCollection: SampleData.collection, uncollectedLetters: ["A","B","C"])
+    SlidingCards(photoItems: SampleData.photos, currentCollection: SampleData.collection, uncollectedLetters: [])
 }

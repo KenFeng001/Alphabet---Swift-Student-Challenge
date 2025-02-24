@@ -54,6 +54,10 @@ struct AlphabetApp: App {
                 
                 // 如果没有任何 collection，导入示例数据
                 if existingCollections.isEmpty {
+                    // 导入 SampleData0 中的数据
+                    let starterCollection = SampleData0.collection
+                    context.insert(starterCollection)
+                    
                     // 导入 SampleData 中的数据
                     let sampleCollection = SampleData.collection
                     context.insert(sampleCollection)
