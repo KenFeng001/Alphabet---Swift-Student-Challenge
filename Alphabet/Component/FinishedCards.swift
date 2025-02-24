@@ -37,7 +37,7 @@ struct FinishedCards: View {
                 
                 HStack {
                     Button {
-                        // 创建导出图片
+                        // Create export image
                         let exportView = ExportGrid(collection: currentCollection)
                             .frame(width: UIScreen.main.bounds.width)
                             .background(Color.white)
@@ -69,18 +69,18 @@ struct FinishedCards: View {
                             .scaledToFit()
                             .padding()
                         
-                        Button("保存到相册") {
+                        Button("Save to Photos") {
                             UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
                             showingPreview = false
                         }
                         .buttonStyle(.borderedProminent)
                         .padding()
                     }
-                    .navigationTitle("预览")
+                    .navigationTitle("Preview")
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbar {
                         ToolbarItem(placement: .topBarTrailing) {
-                            Button("关闭") {
+                            Button("Close") {
                                 showingPreview = false
                             }
                         }

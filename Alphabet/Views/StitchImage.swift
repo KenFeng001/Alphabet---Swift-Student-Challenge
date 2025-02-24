@@ -5,13 +5,13 @@ struct StitchImage: View {
     let typedText: String
     let stichedCollection: PhotoCollection
     
-    // 计算要显示的照片
+    // Calculate photos to display
     private var photosToDisplay: [PhotoItem] {
         if isAllLetters {
-            // 显示所有照片
+            // Display all photos
             return stichedCollection.photos
         } else {
-            // 只显示输入文字对应的照片
+            // Only display photos corresponding to input text
             let letters = Array(typedText.uppercased())
             return letters.compactMap { letter in
                 stichedCollection.photos.first { $0.letter == String(letter) }
@@ -19,18 +19,18 @@ struct StitchImage: View {
         }
     }
     
-    // 计算每行显示的图片数量
+    // Calculate number of images to display per row
     private let columnsCount = 7
     
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                // 标题
+                // Title
                 Text(isAllLetters ? "All Letters" : "Text: \(typedText)")
                     .font(.title)
                     .padding(.horizontal)
                 
-                // 图片网格
+                // Image grid
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 4), count: columnsCount), spacing: 4) {
                     ForEach(photosToDisplay, id: \.id) { photo in
                         if let uiImage = UIImage(data: photo.imageData) {

@@ -12,21 +12,21 @@ struct ViewfinderView: View {
     @Environment(\.modelContext) private var modelContext
     @State var selectedLetter: String
     var currentCollection: PhotoCollection?
-    @State private var zoomText: String = "1x"  // 添加状态变量
+    @State private var zoomText: String = "1x"  // Add state variable
     
     var body: some View {
         NavigationStack {
             VStack(spacing: UIDevice.current.userInterfaceIdiom == .pad ? 45 : 30) {  // 30 * 1.5 = 45
-                // 顶部当前选中的字母显示
+                // Top current selected letter display
                 Text("\(selectedLetter);\(selectedLetter.lowercased())")
-                    .font(.system(size: UIDevice.current.userInterfaceIdiom == .pad ? 72 : 48))  // 字体也放大1.5倍
+                    .font(.system(size: UIDevice.current.userInterfaceIdiom == .pad ? 72 : 48))  // Font size increased by 1.5x for iPad
                     .fontWeight(.bold)
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, UIDevice.current.userInterfaceIdiom == .pad ? 60 : 40)  // padding也放大1.5倍
-                    .padding(.top, UIDevice.current.userInterfaceIdiom == .pad ? 60 : 40)  // padding也放大1.5倍
+                    .padding(.horizontal, UIDevice.current.userInterfaceIdiom == .pad ? 60 : 40)  // Padding increased by 1.5x for iPad
+                    .padding(.top, UIDevice.current.userInterfaceIdiom == .pad ? 60 : 40)  // Top padding increased by 1.5x for iPad
                 
-                // 相机预览
+                // Camera preview
                 if let image = model.viewfinderImage {
                     image
                         .resizable()
@@ -43,9 +43,9 @@ struct ViewfinderView: View {
                 
                 letterSelector
                 
-                // 底部控制栏
+                // Bottom control bar
                 HStack(spacing: UIDevice.current.userInterfaceIdiom == .pad ? 45 : 30) {  // 30 * 1.5 = 45
-                    // 返回按钮
+                    // Back button
                     Button(action: {
                         dismiss()
                     }) {
