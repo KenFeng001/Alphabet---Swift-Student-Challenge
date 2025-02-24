@@ -71,11 +71,6 @@ struct Card: View {
                         }) {
                             Image("takeimage")
                         }
-                        Button(action: {
-                            // 处理导入按钮的点击事件
-                        }) {
-                            Image("import")
-                        }
                     }
                     .padding(.leading, 140)
                     .padding(.top, 30)

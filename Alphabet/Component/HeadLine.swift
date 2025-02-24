@@ -61,7 +61,7 @@ struct HeadLine: View {
                     HStack {
                         Image(systemName: "plus.circle.fill")
                             .font(.system(size: 32))
-                        Text("创建集合")
+                        Text("Create Collection")
                             .font(.system(size: 32, weight: .bold))
                     }
                     .foregroundColor(.gray)

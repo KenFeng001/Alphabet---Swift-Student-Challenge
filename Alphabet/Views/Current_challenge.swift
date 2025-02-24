@@ -47,7 +47,7 @@ struct Current_challenge: View {
                             VStack(spacing: 12) {
                                 Image(systemName: "plus.circle.fill")
                                     .font(.system(size: 60))
-                                Text("创建你的第一个集合")
+                                Text("Create your collection")
                                     .font(.system(size: 20, weight: .medium))
                             }
                             .foregroundColor(.gray)
