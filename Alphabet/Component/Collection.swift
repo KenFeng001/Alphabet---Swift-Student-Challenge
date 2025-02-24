@@ -24,46 +24,49 @@ struct Collection: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            GeometryReader { geometry in
-                HStack(spacing: 8) {
-                    // 主图
-                    if let mainPhoto = photos.main,
-                       let uiImage = UIImage(data: mainPhoto.imageData) {
-                        Image(uiImage: uiImage)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: geometry.size.width * 0.6, height: 250)
-                            .clipShape(RoundedRectangle(cornerRadius: 16))
-                    } else {
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(Color.gray.opacity(0.2))
-                            .frame(width: geometry.size.width * 0.6)
-                    }
-                    
-                    // 右侧小图
-                    if !photos.small.isEmpty {
-                        VStack(spacing: 8) {
-                            ForEach(photos.small, id: \.id) { photo in
-                                if let uiImage = UIImage(data: photo.imageData) {
-                                    Image(uiImage: uiImage)
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(width: geometry.size.width * 0.4 - 8, height: (geometry.size.height - 8) / 2)
-                                        .clipShape(RoundedRectangle(cornerRadius: 12))
+            // 只在有照片时显示图片区域
+            if !photoCollection.photos.isEmpty {
+                GeometryReader { geometry in
+                    HStack(spacing: 8) {
+                        // 主图
+                        if let mainPhoto = photos.main,
+                           let uiImage = UIImage(data: mainPhoto.imageData) {
+                            Image(uiImage: uiImage)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: geometry.size.width * 0.6, height: 250)
+                                .clipShape(RoundedRectangle(cornerRadius: 16))
+                        } else {
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color.gray.opacity(0.2))
+                                .frame(width: geometry.size.width * 0.6)
+                        }
+                        
+                        // 右侧小图
+                        if !photos.small.isEmpty {
+                            VStack(spacing: 8) {
+                                ForEach(photos.small, id: \.id) { photo in
+                                    if let uiImage = UIImage(data: photo.imageData) {
+                                        Image(uiImage: uiImage)
+                                            .resizable()
+                                            .scaledToFill()
+                                            .frame(width: geometry.size.width * 0.4 - 8, height: (geometry.size.height - 8) / 2)
+                                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                                    }
                                 }
-                            }
-                            
-                            // 补充占位符
-                            ForEach(0..<(2 - photos.small.count), id: \.self) { _ in
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(Color.gray.opacity(0.2))
-                                    .frame(width: geometry.size.width * 0.4 - 8, height: (geometry.size.height - 8) / 2)
+                                
+                                // 补充占位符
+                                ForEach(0..<(2 - photos.small.count), id: \.self) { _ in
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(Color.gray.opacity(0.2))
+                                        .frame(width: geometry.size.width * 0.4 - 8, height: (geometry.size.height - 8) / 2)
+                                }
                             }
                         }
                     }
                 }
+                .frame(height: 250)
             }
-            .frame(height: 250)
             
             // 集合名称和进度
             VStack(alignment: .leading, spacing: 4) {

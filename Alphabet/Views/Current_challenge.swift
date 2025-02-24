@@ -144,6 +144,13 @@ struct Current_challenge: View {
                             .offset(y: 20)
                         }
                     }
+                    .navigationDestination(isPresented: $showingImagePreview) {
+                        ImagePreviewer(
+                            photos: selectedPreviewPhotos,
+                            selectedLetter: selectedPreviewLetter,
+                            isPresented: $showingImagePreview
+                        )
+                    }
                 }
             }
             .sheet(isPresented: $showingCreateCollection) {
@@ -156,23 +163,6 @@ struct Current_challenge: View {
                     selectedCollectionId = newValue.first?.id
                 }
             }
-            .blur(radius: showingImagePreview ? 3 : 0)
-        }
-        .overlay {
-            ZStack {
-                if showingImagePreview {
-                    ImagePreviewer(
-                        photos: selectedPreviewPhotos,
-                        selectedLetter: selectedPreviewLetter,
-                        isPresented: $showingImagePreview
-                    )
-                    .transition(.asymmetric(
-                        insertion: .opacity.combined(with: .scale(scale: 0.9)),
-                        removal: .opacity.combined(with: .scale(scale: 0.9))
-                    ))
-                }
-            }
-            .animation(.spring(response: 0.3, dampingFraction: 0.8), value: showingImagePreview)
         }
     }
 }

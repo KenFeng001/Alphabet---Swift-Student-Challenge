@@ -10,7 +10,7 @@ struct CollectionView: View {
     var body: some View {
         NavigationStack {
             ScrollView(showsIndicators: false) {
-                VStack(spacing: 16) {
+                VStack(spacing: 25) {
                     Color.clear
                         .frame(height: 60)
                         
