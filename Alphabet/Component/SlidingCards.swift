@@ -15,7 +15,7 @@ struct SlidingCards: View {
                     Text("No collection available.")
                 }
             } else {
-                HStack(spacing: 40) {
+                HStack(spacing: UIDevice.current.userInterfaceIdiom == .pad ? 60 : 40) {
                     ForEach(uncollectedLetters, id: \.self) { letter in
                         Card(
                             title: letter,
@@ -27,10 +27,10 @@ struct SlidingCards: View {
                                 .scaleEffect(phase.isIdentity ? 1 : 0.9)
                         }
                     }
-                    .frame(width: 337-40)
+                    .frame(width: UIDevice.current.userInterfaceIdiom == .pad ? 445.5 : 297)
                 }
                 .scrollTargetLayout()
-                .padding(.horizontal, 50)
+                .padding(.horizontal, UIDevice.current.userInterfaceIdiom == .pad ? 200 : 50)
             }
         }
         .scrollTargetBehavior(.viewAligned)
@@ -38,5 +38,5 @@ struct SlidingCards: View {
 } 
 
 #Preview {
-    SlidingCards(photoItems: SampleData.photos, currentCollection: SampleData.collection, uncollectedLetters: ["A"])
+    SlidingCards(photoItems: SampleData.photos, currentCollection: SampleData.collection, uncollectedLetters: ["A","B","C"])
 }

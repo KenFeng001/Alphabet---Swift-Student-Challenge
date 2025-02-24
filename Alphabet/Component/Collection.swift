@@ -34,7 +34,8 @@ struct Collection: View {
                             Image(uiImage: uiImage)
                                 .resizable()
                                 .scaledToFill()
-                                .frame(width: geometry.size.width * 0.6, height: 250)
+                                .frame(width: geometry.size.width * 0.6, 
+                                      height: UIDevice.current.userInterfaceIdiom == .pad ? 375 : 250) // 250 * 1.5 = 375
                                 .clipShape(RoundedRectangle(cornerRadius: 16))
                         } else {
                             RoundedRectangle(cornerRadius: 16)
@@ -44,13 +45,14 @@ struct Collection: View {
                         
                         // 右侧小图
                         if !photos.small.isEmpty {
-                            VStack(spacing: 8) {
+                            VStack(spacing: UIDevice.current.userInterfaceIdiom == .pad ? 12 : 8) { // 间距也相应增加
                                 ForEach(photos.small, id: \.id) { photo in
                                     if let uiImage = UIImage(data: photo.imageData) {
                                         Image(uiImage: uiImage)
                                             .resizable()
                                             .scaledToFill()
-                                            .frame(width: geometry.size.width * 0.4 - 8, height: (geometry.size.height - 8) / 2)
+                                            .frame(width: geometry.size.width * 0.4 - 8, 
+                                                   height: (UIDevice.current.userInterfaceIdiom == .pad ? (375-12) : 250 - 12) / 2)
                                             .clipShape(RoundedRectangle(cornerRadius: 12))
                                     }
                                 }
@@ -59,14 +61,14 @@ struct Collection: View {
                                 ForEach(0..<(2 - photos.small.count), id: \.self) { _ in
                                     RoundedRectangle(cornerRadius: 12)
                                         .fill(Color.gray.opacity(0.2))
-                                        .frame(width: geometry.size.width * 0.4 - 8, height: (geometry.size.height - 8) / 2)
+                                        .frame(width: geometry.size.width * 0.4 - 8, 
+                                               height: (UIDevice.current.userInterfaceIdiom == .pad ? 375 : 250 - 8) / 2)
                                 }
                             }
                         }
                     }
                 }
-                .frame(height: 250)
-            }
+                .frame(height: UIDevice.current.userInterfaceIdiom == .pad ? 375 : 250)            }
             
             // 集合名称和进度
             VStack(alignment: .leading, spacing: 4) {

@@ -78,7 +78,7 @@ struct Current_challenge: View {
                             SlidingCards(photoItems: currentPhotos, 
                                        currentCollection: currentCollection, 
                                        uncollectedLetters: uncollectedLetters)
-                                .frame(height: 461)
+                                .frame(height: UIDevice.current.userInterfaceIdiom == .pad ? 691.5 : 461) // 461 * 1.5 = 691.5
                             
                             VStack {
                                 Divider()

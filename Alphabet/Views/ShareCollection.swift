@@ -1,111 +1,127 @@
 import SwiftUI
 
 struct ShareCollection: View {
-    enum Mode {
-        case allLetters    // 模式1：所有字母
-        case selectedLetters    // 模式2：选定字母
-    }
-    
-    let collection: PhotoCollection
-    @State private var mode: Mode = .allLetters
-    @State private var selectedLetters: Set<String> = []
-    @State private var generatedImage: UIImage?
-    
-    var body: some View {
-        VStack {
-            // 模式选择器
-            Picker("分享模式", selection: $mode) {
-                Text("所有字母").tag(Mode.allLetters)
-                Text("选择字母").tag(Mode.selectedLetters)
-            }
-            .pickerStyle(.segmented)
-            .padding()
-            
-            if mode == .selectedLetters {
-                // 字母选择网格
-                LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 6)) {
-                    ForEach(collection.collectedLetters.sorted(), id: \.self) { letter in
-                        LetterSelectButton(
-                            letter: letter,
-                            isSelected: selectedLetters.contains(letter),
-                            action: {
-                                if selectedLetters.contains(letter) {
-                                    selectedLetters.remove(letter)
-                                } else {
-                                    selectedLetters.insert(letter)
-                                }
-                            }
-                        )
-                    }
-                }
-                .padding()
-            }
-            
-            // 预览区域
-            if let image = generatedImage {
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFit()
-                    .padding()
-            }
-            
-            // 生成按钮
-            Button(action: generateImage) {
-                Text("生成分享图")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.blue)
-                    .cornerRadius(10)
-            }
-            .padding()
-        }
-    }
-    
-    private func generateImage() {
-
-    }
-}
-
-// 字母选择按钮组件
-struct LetterSelectButton: View {
-    let letter: String
-    let isSelected: Bool
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            Text(letter)
-                .font(.system(size: 20, weight: .medium))
-                .frame(width: 40, height: 40)
-                .background(isSelected ? Color.blue : Color.gray.opacity(0.2))
-                .foregroundColor(isSelected ? .white : .black)
-                .cornerRadius(8)
-        }
-    }
-}
-
-struct ShareCollectionSheet: View {
     @Environment(\.dismiss) private var dismiss
-    let collection: PhotoCollection
+    @State private var selectedOption = 0 // 0: all letters, 1: typed letters
+    @State private var typedText = ""
+    @FocusState private var isTextFieldFocused: Bool  // 改用 FocusState
+    @State private var navigateToStitch = false
+    var stichedCollection:PhotoCollection
+    
     
     var body: some View {
         NavigationStack {
-            ShareCollection(collection: collection)
-                .navigationTitle("分享集合")
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .topBarLeading) {
-                        Button("取消") {
-                            dismiss()
+            VStack(spacing: 20) {
+                // Back button
+                HStack {
+                    Button {
+                        dismiss()
+                    } label: {
+                        HStack {
+                            Image(systemName: "chevron.left")
+                            Text("返回")
                         }
+                        .foregroundColor(.blue)
+                    }
+                    Spacer()
+                }
+                .padding(.horizontal)
+                
+                
+                // Title and description
+                VStack(spacing: 8) {
+                    Text("Stictch your collection and share it with your friends!")
+                        .font(.title2)
+                        .fontWeight(.semibold)
+                    
+
+                }
+                .padding(.horizontal, 24)
+                
+                // Options
+                VStack(spacing: 16) {
+                    // Option 1
+                    Button {
+                        selectedOption = 0
+                        isTextFieldFocused = false  // 选择选项1时取消文本框焦点
+                    } label: {
+                        HStack {
+                            Text("Stitch all the letters")
+                                .foregroundColor(.primary)
+                            Spacer()
+                            if selectedOption == 0 {
+                                Image(systemName: "checkmark")
+                                    .foregroundColor(.blue)
+                            }
+                        }
+                        .padding()
+                        .background(Color(.systemGray6))
+                        .cornerRadius(8)
+                    }
+                    
+                    // Option 2
+                    Button {
+                        selectedOption = 1
+                        isTextFieldFocused = true  // 选择选项2时聚焦文本框
+                    } label: {
+                        HStack {
+                            Text("Stitch typed letters")
+                                .foregroundColor(.primary)
+                            Spacer()
+                            if selectedOption == 1 {
+                                Image(systemName: "checkmark")
+                                    .foregroundColor(.blue)
+                            }
+                        }
+                        .padding()
+                        .background(Color(.systemGray6))
+                        .cornerRadius(8)
+                    }
+                    
+                    // Text field
+                    if selectedOption == 1 {
+                        TextEditor(text: $typedText)
+                            .frame(height: 100)  // 设置固定高度
+                            .multilineTextAlignment(.center)
+                            .focused($isTextFieldFocused)  // 使用 FocusState
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+                            )
+                            .padding(.horizontal, 2)
                     }
                 }
+                .padding(.horizontal, 24)
+                
+                Spacer()
+                
+                
+                // Continue button
+                Button {
+                    navigateToStitch = true
+                } label: {
+                    Text("继续")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                }
+                .padding(.horizontal, 24)
+                .padding(.bottom, 32)
+            }
+            .background(Color(uiColor: .systemBackground))
+            .navigationDestination(isPresented: $navigateToStitch) {
+                StitchImage(
+                    isAllLetters: selectedOption == 0,
+                    typedText: typedText,
+                    stichedCollection: stichedCollection
+                )
+            }
         }
     }
 }
 
 #Preview {
-    ShareCollection(collection: SampleData.collection)
+    ShareCollection(stichedCollection: SampleData.collection)
 }

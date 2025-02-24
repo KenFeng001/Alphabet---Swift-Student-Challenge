@@ -16,14 +16,15 @@ struct ViewfinderView: View {
     
     var body: some View {
         NavigationStack {
-            VStack(spacing: 30) {
+            VStack(spacing: UIDevice.current.userInterfaceIdiom == .pad ? 45 : 30) {  // 30 * 1.5 = 45
                 // 顶部当前选中的字母显示
-            Text("\(selectedLetter);\(selectedLetter.lowercased())")
-                .font(.system(size: 48, weight: .bold))
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 40)
-                .padding(.top, 40)    
+                Text("\(selectedLetter);\(selectedLetter.lowercased())")
+                    .font(.system(size: UIDevice.current.userInterfaceIdiom == .pad ? 72 : 48))  // 字体也放大1.5倍
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, UIDevice.current.userInterfaceIdiom == .pad ? 60 : 40)  // padding也放大1.5倍
+                    .padding(.top, UIDevice.current.userInterfaceIdiom == .pad ? 60 : 40)  // padding也放大1.5倍
                 
                 // 相机预览
                 if let image = model.viewfinderImage {
@@ -43,17 +44,18 @@ struct ViewfinderView: View {
                 letterSelector
                 
                 // 底部控制栏
-                HStack(spacing: 30) {
+                HStack(spacing: UIDevice.current.userInterfaceIdiom == .pad ? 45 : 30) {  // 30 * 1.5 = 45
                     // 返回按钮
                     Button(action: {
                         dismiss()
                     }) {
                         Circle()
                             .fill(Color.white.opacity(0.2))
-                            .frame(width: 60, height: 60)
+                            .frame(width: UIDevice.current.userInterfaceIdiom == .pad ? 90 : 60,  // 60 * 1.5 = 90
+                                   height: UIDevice.current.userInterfaceIdiom == .pad ? 90 : 60)
                             .overlay(
                                 Image(systemName: "chevron.left")
-                                    .font(.system(size: 20))
+                                    .font(.system(size: UIDevice.current.userInterfaceIdiom == .pad ? 30 : 20))  // 20 * 1.5 = 30
                                     .foregroundColor(.white)
                             )
                     }
@@ -65,8 +67,9 @@ struct ViewfinderView: View {
                         }
                     }) {
                         Circle()
-                            .stroke(Color.white, lineWidth: 3)
-                            .frame(width: 70, height: 70)
+                            .stroke(Color.white, lineWidth: UIDevice.current.userInterfaceIdiom == .pad ? 4.5 : 3)  // 3 * 1.5 = 4.5
+                            .frame(width: UIDevice.current.userInterfaceIdiom == .pad ? 105 : 70,  // 70 * 1.5 = 105
+                                   height: UIDevice.current.userInterfaceIdiom == .pad ? 105 : 70)
                             .background(Circle().fill(Color.white.opacity(0.2)))
                     }
                     .background(navigationLink)
@@ -78,11 +81,13 @@ struct ViewfinderView: View {
                     }) {
                         Circle()
                             .fill(Color.white.opacity(0.2))
-                            .frame(width: 60, height: 60)
+                            .frame(width: UIDevice.current.userInterfaceIdiom == .pad ? 90 : 60,  // 60 * 1.5 = 90
+                                   height: UIDevice.current.userInterfaceIdiom == .pad ? 90 : 60)
                             .overlay(
                                 Text(zoomText)
                                     .foregroundColor(.white)
-                                    .font(.system(size: 16, weight: .medium))
+                                    .font(.system(size: UIDevice.current.userInterfaceIdiom == .pad ? 24 : 16))  // 16 * 1.5 = 24
+                                    .fontWeight(.medium)
                             )
                     }
                 }

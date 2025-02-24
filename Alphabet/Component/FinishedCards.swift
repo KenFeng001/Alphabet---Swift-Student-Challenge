@@ -2,7 +2,8 @@ import SwiftUI
 
 struct FinishedCards: View {
     var currentCollection: PhotoCollection
-
+    @State private var showShareSheet = false
+    
     var body: some View {
         ZStack {
             Image("CongratulationsBG")
@@ -31,7 +32,11 @@ struct FinishedCards: View {
                 }
                 
                 HStack {
-                    Image("share")
+                    Button {
+                        showShareSheet = true
+                    } label: {
+                        Image("share")
+                    }
                 }
                 .padding(.leading, 140)
                 .padding(.top, 30)
@@ -40,6 +45,9 @@ struct FinishedCards: View {
         .frame(width: 349, height: 461)
         .clipped()
         .cornerRadius(20)
+        .sheet(isPresented: $showShareSheet) {
+            ShareCollection( stichedCollection: currentCollection)
+        }
     }
 }
 

@@ -36,11 +36,13 @@ struct SmallCard: View {
                                     Image(uiImage: otherImage)
                                         .resizable()
                                         .scaledToFill()
-                                        .frame(width: 100, height: 132)
+                                        .frame(width: UIDevice.current.userInterfaceIdiom == .pad ? 150 : 100, 
+                                               height: UIDevice.current.userInterfaceIdiom == .pad ? 198 : 132)
                                         .clipped()
                                         .background(Color.gray)
                                         .cornerRadius(10)
-                                        .offset(x: 4, y: -5)
+                                        .offset(x: UIDevice.current.userInterfaceIdiom == .pad ? 6 : 4, 
+                                               y: UIDevice.current.userInterfaceIdiom == .pad ? -7.5 : -5)
                                         .rotationEffect(.degrees(3))
                                         .opacity(0.5)
                                 }
@@ -49,7 +51,8 @@ struct SmallCard: View {
                                 Image(uiImage: pinnedImage)
                                     .resizable()
                                     .scaledToFill()
-                                    .frame(width: 100, height: 132)
+                                    .frame(width: UIDevice.current.userInterfaceIdiom == .pad ? 150 : 100, 
+                                           height: UIDevice.current.userInterfaceIdiom == .pad ? 198 : 132)
                                     .clipped()
                                     .background(Color.gray)
                                     .cornerRadius(10)
@@ -60,7 +63,8 @@ struct SmallCard: View {
                                 Image(uiImage: firstImage)
                                     .resizable()
                                     .scaledToFill()
-                                    .frame(width: 100, height: 132)
+                                    .frame(width: UIDevice.current.userInterfaceIdiom == .pad ? 150 : 100, 
+                                           height: UIDevice.current.userInterfaceIdiom == .pad ? 198 : 132)
                                     .clipped()
                                     .background(Color.gray)
                                     .cornerRadius(10)
@@ -88,8 +92,8 @@ struct SmallCard: View {
                     
                     Text(letter.uppercased() + letter.lowercased())
                         .fontWeight(.bold)
-                        .font(.system(size: 14))
-                        .padding(.top, 4)
+                        .font(.system(size: UIDevice.current.userInterfaceIdiom == .pad ? 21 : 14))
+                        .padding(.top, UIDevice.current.userInterfaceIdiom == .pad ? 6 : 4)
                 }
             } else {
                 // 没有照片的情况
@@ -110,14 +114,15 @@ struct SmallCard: View {
                         Image("smallcardbg")
                             .resizable()
                             .scaledToFill()
-                            .frame(width: 100, height: 132)
+                            .frame(width: UIDevice.current.userInterfaceIdiom == .pad ? 150 : 100, 
+                                   height: UIDevice.current.userInterfaceIdiom == .pad ? 198 : 132)
                             .cornerRadius(10)
                     }
                     
                     Text(letter.uppercased() + letter.lowercased())
                         .fontWeight(.bold)
-                        .font(.system(size: 14))
-                        .padding(.top, 4)
+                        .font(.system(size: UIDevice.current.userInterfaceIdiom == .pad ? 21 : 14))
+                        .padding(.top, UIDevice.current.userInterfaceIdiom == .pad ? 6 : 4)
                 }
             }
         }

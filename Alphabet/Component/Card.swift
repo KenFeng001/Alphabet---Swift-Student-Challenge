@@ -23,7 +23,8 @@ struct Card: View {
                 Image("cardbackground")
                     .resizable()
                     .scaledToFill()
-                    .frame(width: 337, height: 449)
+                    .frame(width: UIDevice.current.userInterfaceIdiom == .pad ? 505.5 : 337, 
+                           height: UIDevice.current.userInterfaceIdiom == .pad ? 673.5 : 449)
                 
                 VStack(spacing: 0) {
                     VStack {
@@ -81,7 +82,8 @@ struct Card: View {
 
                 }
             }
-            .frame(width: 349, height: 461)
+            .frame(width: UIDevice.current.userInterfaceIdiom == .pad ? 523.5 : 349, 
+                   height: UIDevice.current.userInterfaceIdiom == .pad ? 691.5 : 461)
             .clipped()
             .cornerRadius(20)
             .navigationDestination(isPresented: $showViewfinder) {
@@ -113,3 +115,6 @@ struct Card: View {
     }
 }
 
+#Preview {
+    Card(title: "A", currentCollection: SampleData.collection)
+}
