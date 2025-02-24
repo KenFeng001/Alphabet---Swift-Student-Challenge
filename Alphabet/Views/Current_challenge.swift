@@ -184,27 +184,43 @@ struct CreateCollectionView: View {
     @State private var collectionName: String = ""
     @State private var isTimeLimited: Bool = false
     @State private var endDate: Date = Date()
-    var onCollectionCreated: (UUID) -> Void  // 添加回调函数
+    var onCollectionCreated: (UUID) -> Void
+    
+    // 预设的主题建议
+    let suggestedThemes = ["Travel", "Afternoon", "My Room", "Nature", "City Life", "Food"]
     
     var body: some View {
         NavigationView {
             Form {
                 Section(header: Text("Collection Name")) {
                     TextField("Enter collection name", text: $collectionName)
-                }
-                
-                Section {
-                    Toggle("Time Limited", isOn: $isTimeLimited)
                     
-                    if isTimeLimited {
-                        DatePicker("End Date", selection: $endDate, displayedComponents: .date)
+                    // 主题建议
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 8) {
+                            ForEach(suggestedThemes, id: \.self) { theme in
+                                Button(action: {
+                                    collectionName = theme
+                                }) {
+                                    Text(theme)
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 6)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 15)
+                                                .fill(Color.gray.opacity(0.2))
+                                        )
+                                        .foregroundColor(.primary)
+                                }
+                            }
+                        }
+                        .padding(.vertical, 8)
                     }
                 }
                 
                 Button("Create") {
                     let tempCollection = PhotoCollection(name: collectionName, expectedEndDate: endDate)
                     modelContext.insert(tempCollection)
-                    onCollectionCreated(tempCollection.id)  // 将新 ID 传递给回调函数
+                    onCollectionCreated(tempCollection.id)
                     print("new collection has created")
                     dismiss()
                 }

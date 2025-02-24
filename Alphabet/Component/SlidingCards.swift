@@ -7,27 +7,36 @@ struct SlidingCards: View {
     
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 40) {
-                ForEach(uncollectedLetters, id: \.self) { letter in
-                    Card(
-                        title: letter,
-                        currentCollection: currentCollection
-                    )
-                    .scrollTransition(.animated) { content, phase in
-                        content
-                            .opacity(phase.isIdentity ? 1 : 0.8)
-                            .scaleEffect(phase.isIdentity ? 1 : 0.9)
-                    }
+            if uncollectedLetters.isEmpty {
+                if let collection = currentCollection {
+                    FinishedCards(currentCollection: collection)
+                        .padding(.horizontal, 16)
+                } else {
+                    Text("No collection available.")
                 }
-                .frame(width: 337-40)
+            } else {
+                HStack(spacing: 40) {
+                    ForEach(uncollectedLetters, id: \.self) { letter in
+                        Card(
+                            title: letter,
+                            currentCollection: currentCollection
+                        )
+                        .scrollTransition(.animated) { content, phase in
+                            content
+                                .opacity(phase.isIdentity ? 1 : 0.8)
+                                .scaleEffect(phase.isIdentity ? 1 : 0.9)
+                        }
+                    }
+                    .frame(width: 337-40)
+                }
+                .scrollTargetLayout()
+                .padding(.horizontal, 50)
             }
-            .scrollTargetLayout()
-            .padding(.horizontal, 50)
         }
         .scrollTargetBehavior(.viewAligned)
     }
 } 
 
 #Preview {
-    SlidingCards(photoItems: SampleData.photos, currentCollection: SampleData.collection, uncollectedLetters: ["A", "B", "C"])
+    SlidingCards(photoItems: SampleData.photos, currentCollection: SampleData.collection, uncollectedLetters: ["A"])
 }

@@ -51,7 +51,6 @@ final class DataModel: ObservableObject {
                 imageData = photoData.imageData
 
             }
-//            savePhoto(imageData: photoData.imageData)
         }
     }
     

@@ -75,6 +75,7 @@ struct ViewfinderImagePreview: View {
 
     // 保存图像的函数
     private func saveImage() {
+        // 保存到 App 内
         let photoItem = PhotoItem(
             letter: selectedLetter, 
             imageData: imageData,
@@ -82,6 +83,12 @@ struct ViewfinderImagePreview: View {
         )
         modelContext.insert(photoItem)
         currentCollection?.pinPhotoItem(for: selectedLetter, photoItem: photoItem)
+        
+        // 保存到系统相册
+        if let uiImage = UIImage(data: imageData) {
+            UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil)
+        }
+        
         print("Saving image with letter: \(selectedLetter) to collection: \(currentCollection?.name ?? "none")")
     }
 }

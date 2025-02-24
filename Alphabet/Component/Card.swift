@@ -8,6 +8,7 @@ struct Card: View {
     @State private var isTextVisible = false
     @State private var randomQuote: MotivationalQuote
     @State private var selectedBackdrop: Int
+    @State private var showViewfinder = false  // 添加状态变量来控制导航
     
     init(title: String, currentCollection: PhotoCollection?) {
         self.title = title
@@ -17,6 +18,7 @@ struct Card: View {
     }
     
     var body: some View {
+        NavigationStack {
             ZStack {
                 Image("cardbackground")
                     .resizable()
@@ -25,7 +27,8 @@ struct Card: View {
                 
                 VStack(spacing: 0) {
                     VStack {
-                        
+                        Image("Eyes")
+
                         Text("Looking for")
                             .font(.system(size: 24))
                     }
@@ -43,6 +46,7 @@ struct Card: View {
                             .foregroundColor(.black)
                             .scaleEffect(isLetterVisible ? 1 : 0.5)
                             .opacity(isLetterVisible ? 1 : 0)
+                            .frame(maxWidth: .infinity, alignment: .center)
                     }
                     
                     Text(randomQuote.quote)
@@ -58,9 +62,12 @@ struct Card: View {
                         .padding(.top, 4)
                         .opacity(isTextVisible ? 1 : 0)
                         .scaleEffect(isTextVisible ? 1 : 0.8)
+                        .frame(maxWidth: .infinity, alignment: .center)
 
                     HStack {
-                        NavigationLink(destination: ViewfinderView(selectedLetter: title, currentCollection: currentCollection)) {
+                        Button(action: {
+                            showViewfinder = true  // 点击时设置状态为 true
+                        }) {
                             Image("takeimage")
                         }
                         Button(action: {
@@ -77,6 +84,9 @@ struct Card: View {
             .frame(width: 349, height: 461)
             .clipped()
             .cornerRadius(20)
+            .navigationDestination(isPresented: $showViewfinder) {
+                ViewfinderView(selectedLetter: title, currentCollection: currentCollection)
+            }
             .onAppear {
                 // 背景动画
                 withAnimation(.easeOut(duration: 0.6)) {
@@ -101,4 +111,5 @@ struct Card: View {
             }
         }
     }
+}
 
