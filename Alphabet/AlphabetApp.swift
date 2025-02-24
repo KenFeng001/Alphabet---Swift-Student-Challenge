@@ -54,17 +54,24 @@ struct AlphabetApp: App {
                 
                 // 如果没有任何 collection，导入示例数据
                 if existingCollections.isEmpty {
-                    // 导入 SampleData 中的 collection
+                    // 导入 SampleData 中的数据
                     let sampleCollection = SampleData.collection
                     context.insert(sampleCollection)
                     
-                    // 导入示例照片
                     for photo in SampleData.photos {
                         context.insert(photo)
                     }
                     
+                    // 导入 SampleData2 中的数据
+                    let sampleCollection2 = SampleData2.collection
+                    context.insert(sampleCollection2)
+                    
+                    for photo in SampleData2.photos {
+                        context.insert(photo)
+                    }
+                    
                     try context.save()
-                    print("成功导入示例数据")
+                    print("成功导入所有示例数据")
                 }
             } catch {
                 print("创建或导入 Collection 失败: \(error)")
