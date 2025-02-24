@@ -42,7 +42,7 @@ struct SampleData2 {
     static let photos: [PhotoItem] = {
         let letters = Array("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
         return letters.enumerated().map { index, letter in
-            let imageName = "Sample\(index + 1)"
+            let imageName = String(format: "Sample%02d", index + 1)
             return PhotoItem(
                 letter: String(letter),
                 imageData: UIImage(named: imageName)?.jpegData(compressionQuality: 0.8) ?? Data(),

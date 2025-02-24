@@ -16,6 +16,11 @@ struct HeadLine: View {
         return "Empty"
     }
     
+    // 获取当前选中的collection
+    private var currentCollection: PhotoCollection? {
+        photoCollections.first { $0.id == selectedCollectionId }
+    }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 4) {
@@ -94,9 +99,10 @@ struct HeadLine: View {
                 selectedCollectionId = newId
             }
         }
-        .onAppear {
-            if selectedCollectionId == nil {
-                selectedCollectionId = SampleData.collection.id
+        .onChange(of: photoCollections) { oldValue, newValue in
+            // 如果当前选中的 collection 不存在，选择第一个 collection
+            if selectedCollectionId == nil || !newValue.contains(where: { $0.id == selectedCollectionId }) {
+                selectedCollectionId = newValue.first?.id
             }
         }
     }

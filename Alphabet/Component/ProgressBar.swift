@@ -1,14 +1,18 @@
 import SwiftUI
+import SwiftData
 
 struct ProgressBar: View {
     var currentCollection: PhotoCollection?
+    @Query private var photoCollections: [PhotoCollection]
     
     private var progress: Double {
-        currentCollection?.progress ?? 0
+        let updatedCollection = photoCollections.first { $0.id == currentCollection?.id }
+        return updatedCollection?.progress ?? currentCollection?.progress ?? 0
     }
     
     private var progressText: String {
-        let collectedCount = currentCollection?.collectedLetters.count ?? 0
+        let updatedCollection = photoCollections.first { $0.id == currentCollection?.id }
+        let collectedCount = updatedCollection?.collectedLetters.count ?? currentCollection?.collectedLetters.count ?? 0
         return "\(collectedCount)/26"
     }
     
