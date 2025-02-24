@@ -7,20 +7,20 @@
 
 import SwiftUI
 import SwiftData
-import Foundation  // 如果需要的话
+import Foundation  // If needed
 
-// 如果 SortOption 在单独的模块中，需要导入该模块
+// If SortOption is in a separate module, need to import that module
 
 struct CollectionDetailView: View {
-    @Environment(\.dismiss) private var dismiss  // 添加 dismiss 环境变量
-    @Environment(\.modelContext) private var modelContext  // 添加 modelContext
+    @Environment(\.dismiss) private var dismiss  // Add dismiss environment variable
+    @Environment(\.modelContext) private var modelContext  // Add modelContext
     var displayedCollection: PhotoCollection
     @State private var sortBy: SortOption = .time
     @State private var isStacked: Bool = true
     @State private var showUnfinished: Bool = true
-    @State private var showingDeleteAlert = false  // 添加删除确认提示状态
+    @State private var showingDeleteAlert = false  // Add delete confirmation alert state
     
-    // 添加图片预览所需的状态
+    // Add states needed for image preview
     @State private var showingImagePreview = false
     @State private var selectedPreviewPhotos: [PhotoItem] = []
     @State private var selectedPreviewLetter: String = ""
@@ -39,7 +39,7 @@ struct CollectionDetailView: View {
                     sortBy: sortBy
                 )
             }
-            .navigationBarBackButtonHidden(true)  // 隐藏默认的返回按钮
+            .navigationBarBackButtonHidden(true)  // Hide default return button
             .navigationBarTitleDisplayMode(.large)
             .navigationTitle(displayedCollection.name)
             .toolbar {
@@ -56,7 +56,7 @@ struct CollectionDetailView: View {
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
-                        // 排序选项
+                        // Sort options
                         Menu("Sort by") {
                             Button {
                                 sortBy = .time
@@ -81,7 +81,7 @@ struct CollectionDetailView: View {
                             }
                         }
                         
-                        // 堆叠选项
+                        // Stack options
                         Button {
                             isStacked.toggle()
                         } label: {
@@ -93,7 +93,7 @@ struct CollectionDetailView: View {
                             }
                         }
                         
-                        // 显示未完成选项
+                        // Show unfinished options
                         Button {
                             showUnfinished.toggle()
                         } label: {
@@ -105,26 +105,26 @@ struct CollectionDetailView: View {
                             }
                         }
                         
-                        Divider()  // 添加分隔线
+                        Divider()  // Add separator
                         
-                        // 添加删除选项
-                        Button(role: .destructive) {  // 使用 destructive 角色使其显示为红色
+                        // Add delete options
+                        Button(role: .destructive) {  // Use destructive role to show in red
                             showingDeleteAlert = true
                         } label: {
-                            Label("删除集合", systemImage: "trash")
+                            Label("Delete Collection", systemImage: "trash")
                         }
                     } label: {
                         Image(systemName: "ellipsis")
                     }
                 }
             }
-            .alert("确认删除", isPresented: $showingDeleteAlert) {
-                Button("取消", role: .cancel) { }
-                Button("删除", role: .destructive) {
+            .alert("Confirm Delete", isPresented: $showingDeleteAlert) {
+                Button("Cancel", role: .cancel) { }
+                Button("Delete", role: .destructive) {
                     deleteCollection()
                 }
             } message: {
-                Text("确定要删除这个集合吗？此操作无法撤销。")
+                Text("Are you sure you want to delete this collection? This action cannot be undone.")
             }
         }
         .navigationDestination(isPresented: $showingImagePreview) {
@@ -136,10 +136,10 @@ struct CollectionDetailView: View {
         }
     }
     
-    // 添加删除方法
+    // Add delete method
     private func deleteCollection() {
         modelContext.delete(displayedCollection)
-        dismiss()  // 删除后返回上一页
+        dismiss()  // Return to previous page after deletion
     }
 }
 

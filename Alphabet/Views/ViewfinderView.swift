@@ -60,7 +60,7 @@ struct ViewfinderView: View {
                             )
                     }
                     
-                    // 快门按钮
+                    // Shutter button
                     Button(action: {
                         Task { @MainActor in
                             model.camera.takePhoto()
@@ -74,7 +74,7 @@ struct ViewfinderView: View {
                     }
                     .background(navigationLink)
                     
-                    // 缩放按钮
+                    // Zoom button
                     Button(action: {
                         model.camera.toggleZoom()
                         zoomText = model.camera.zoomDescription
@@ -92,17 +92,17 @@ struct ViewfinderView: View {
                     }
                 }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color.black)
-            .ignoresSafeArea()
-            .task {
-                await model.camera.start()
-            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.black)
+        .ignoresSafeArea()
+        .task {
+            await model.camera.start()
         }
         .navigationBarHidden(true)
     }
     
-    // 修改字母选择器视图
+    // Letter selector view
     private var letterSelector: some View {
         ScrollViewReader { proxy in
             ScrollView(.horizontal, showsIndicators: false) {
@@ -124,7 +124,7 @@ struct ViewfinderView: View {
         }
     }
     
-    // 修改字母按钮视图
+    // Letter button view
     private func letterButton(_ letter: String) -> some View {
         Button(action: {
             selectedLetter = letter
@@ -140,7 +140,7 @@ struct ViewfinderView: View {
         }
     }
     
-    // 抽取快门按钮和导航链接为单独的视图
+    // Extract shutter button and navigation link as separate views
     private var shutterButton: some View {
         Button(action: {
             Task { @MainActor in
@@ -157,7 +157,7 @@ struct ViewfinderView: View {
         .background(navigationLink)
     }
     
-    // 抽取导航链接为单独的视图
+    // Extract navigation link as separate view
     private var navigationLink: some View {
         NavigationLink(
             destination: ViewfinderImagePreview(
