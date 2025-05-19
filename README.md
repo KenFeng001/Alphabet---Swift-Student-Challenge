@@ -1,9 +1,9 @@
-
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/32b419c3-38aa-4cc9-b353-f26fb02b361d" alt="20250519-135245-min" width="400">
-</p>
-
 # 📸 Alphabet Challenge – A Creative Photography App Built with SwiftUI
+
+<video width="600" controls>
+  <source src="demo.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
 ## About Alphabet Challenge
 
