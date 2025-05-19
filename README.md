@@ -1,7 +1,7 @@
 # 📸 Alphabet Challenge – A Creative Photography App Built with SwiftUI
 
 <video width="600" controls>
-  <source src="Demo.mp4" type="video/mp4">
+  <source src="demo.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
