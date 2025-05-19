@@ -1,9 +1,9 @@
 # 📸 Alphabet Challenge – A Creative Photography App Built with SwiftUI
 
-<video width="600" controls>
-  <source src="demo.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+
+https://github.com/user-attachments/assets/77b688bb-30a2-468d-9b1c-730f388dd93c
+
+
 
 ## About Alphabet Challenge
 
