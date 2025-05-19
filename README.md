@@ -1,6 +1,8 @@
 I aimed to create an experience that encourages users to explore their creativity through a gamified approach.  
-<img src="https://github.com/user-attachments/assets/32b419c3-38aa-4cc9-b353-f26fb02b361d" alt="20250519-135245-min" width="400"/>
 
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/32b419c3-38aa-4cc9-b353-f26fb02b361d" alt="20250519-135245-min" width="400">
+</p>
 
 The app consists of two main sections: Finding and Collection. In Finding, users can view the letters they’ve yet to collect. My goal was to make the experience efficient, delightful, and motivational. To help users remember which letters are still uncollected, I designed a sliding card interface with subtle hints about the letter shapes, using SwiftUI’s scrolling features. The interface is smooth, intuitive, and visually engaging, leveraging state-driven animations to celebrate progress and motivate continued exploration.
 
