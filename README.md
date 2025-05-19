@@ -2,7 +2,7 @@
 <p align="center">
   <img src="https://github.com/user-attachments/assets/32b419c3-38aa-4cc9-b353-f26fb02b361d" alt="20250519-135245-min" width="400">
 </p>
-## About alphabet challenge
+ ## About alphabet challenge
 
 I aimed to create an experience that encourages users to explore their creativity through a gamified approach.  
 
