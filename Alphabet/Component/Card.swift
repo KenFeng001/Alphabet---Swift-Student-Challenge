@@ -2,24 +2,24 @@ import SwiftUI
 
 struct Card: View {
     var title: String
-    var currentCollection: PhotoCollection?  // 添加 currentCollection 参数
+    var currentCollection: PhotoCollection?  // Add currentCollection parameter
     @State private var isLetterVisible = false
     @State private var isBackdropVisible = false
     @State private var isTextVisible = false
     @State private var randomQuote: MotivationalQuote
     @State private var selectedBackdrop: Int
-    @State private var showViewfinder = false  // 添加状态变量来控制导航
+    var onCameraRequest: ((String) -> Void)?
     
-    init(title: String, currentCollection: PhotoCollection?) {
+    init(title: String, currentCollection: PhotoCollection?, onCameraRequest: ((String) -> Void)? = nil) {
         self.title = title
         self.currentCollection = currentCollection
+        self.onCameraRequest = onCameraRequest
         _randomQuote = State(initialValue: quotes.randomElement() ?? MotivationalQuote(quote: "Look at the world differently.", author: "Unknown"))
         _selectedBackdrop = State(initialValue: Int.random(in: 0...8))
     }
     
     var body: some View {
-        NavigationStack {
-            ZStack {
+        ZStack {
                 Image("cardbackground")
                     .resizable()
                     .scaledToFill()
@@ -67,7 +67,7 @@ struct Card: View {
 
                     HStack {
                         Button(action: {
-                            showViewfinder = true  // 点击时设置状态为 true
+                            onCameraRequest?(title)
                         }) {
                             Image("takeimage")
                         }
@@ -77,35 +77,31 @@ struct Card: View {
 
                 }
             }
-            .frame(width: UIDevice.current.userInterfaceIdiom == .pad ? 523.5 : 349, 
-                   height: UIDevice.current.userInterfaceIdiom == .pad ? 691.5 : 461)
-            .clipped()
-            .cornerRadius(20)
-            .navigationDestination(isPresented: $showViewfinder) {
-                ViewfinderView(selectedLetter: title, currentCollection: currentCollection)
+        .frame(width: UIDevice.current.userInterfaceIdiom == .pad ? 523.5 : 349, 
+               height: UIDevice.current.userInterfaceIdiom == .pad ? 691.5 : 461)
+        .clipped()
+        .cornerRadius(20)
+        .onAppear {
+            // Background animation
+            withAnimation(.easeOut(duration: 0.6)) {
+                isBackdropVisible = true
             }
-            .onAppear {
-                // 背景动画
-                withAnimation(.easeOut(duration: 0.6)) {
-                    isBackdropVisible = true
-                }
-                
-                // 字母动画
-                withAnimation(.easeOut(duration: 0.4).delay(0.3)) {
-                    isLetterVisible = true
-                }
-                
-                // 文字动画
-                withAnimation(.easeOut(duration: 0.4).delay(0.5)) {
-                    isTextVisible = true
-                }
+            
+            // Letter animation
+            withAnimation(.easeOut(duration: 0.4).delay(0.3)) {
+                isLetterVisible = true
             }
-            .onDisappear {
-                // 重置所有状态
-                isBackdropVisible = false
-                isLetterVisible = false
-                isTextVisible = false
+            
+            // Text animation
+            withAnimation(.easeOut(duration: 0.4).delay(0.5)) {
+                isTextVisible = true
             }
+        }
+        .onDisappear {
+            // Reset all states
+            isBackdropVisible = false
+            isLetterVisible = false
+            isTextVisible = false
         }
     }
 }

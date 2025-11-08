@@ -7,7 +7,7 @@
 import SwiftUI
 
 struct ViewfinderView: View {
-    @StateObject var model = DataModel()
+    @StateObject private var model = DataModel()
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     @State var selectedLetter: String
@@ -99,6 +99,9 @@ struct ViewfinderView: View {
         .task {
             await model.camera.start()
         }
+        .onDisappear {
+            model.camera.stop()
+        }
         .navigationBarHidden(true)
     }
     
@@ -112,12 +115,16 @@ struct ViewfinderView: View {
                             .id(letter)
                     }
                 }
-                .padding(.horizontal, UIScreen.main.bounds.width / 2 - 25)
+                .padding(.horizontal, max(UIScreen.main.bounds.width / 2 - 25, 20))
             }
             .frame(height: 50)
             .background(Color.clear)
-            .onChange(of: selectedLetter) { newValue in
-                withAnimation {
+            .onAppear {
+                // Immediately center the selected letter
+                proxy.scrollTo(selectedLetter, anchor: .center)
+            }
+            .onChange(of: selectedLetter) { oldValue, newValue in
+                withAnimation(.easeInOut(duration: 0.3)) {
                     proxy.scrollTo(newValue, anchor: .center)
                 }
             }

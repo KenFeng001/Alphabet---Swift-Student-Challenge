@@ -17,6 +17,10 @@ struct LetterGrid: View {
     var showUnfinished: Bool
     var sortBy: SortOption
     
+    // 添加状态来控制相机导航
+    @State private var showCamera = false
+    @State private var selectedCameraLetter = ""
+    
     // 获取所有有照片的字母
     private var lettersWithPhotos: Set<String> {
         Set(photoItems.map { $0.letter })
@@ -92,7 +96,11 @@ struct LetterGrid: View {
                             selectedPreviewLetter: $selectedPreviewLetter,
                             currentCollection: currentCollection,
                             isStacked: isStacked,
-                            showUnfinished: showUnfinished
+                            showUnfinished: showUnfinished,
+                            onCameraRequest: { letter in
+                                selectedCameraLetter = letter
+                                showCamera = true
+                            }
                         )
                     }
                     
@@ -106,12 +114,22 @@ struct LetterGrid: View {
                             selectedPreviewLetter: $selectedPreviewLetter,
                             currentCollection: currentCollection,
                             isStacked: isStacked,
-                            showUnfinished: showUnfinished
+                            showUnfinished: showUnfinished,
+                            onCameraRequest: { letter in
+                                selectedCameraLetter = letter
+                                showCamera = true
+                            }
                         )
                     }
                 }
             }
         }
         .padding()
+        .navigationDestination(isPresented: $showCamera) {
+            ViewfinderView(
+                selectedLetter: selectedCameraLetter,
+                currentCollection: currentCollection
+            )
+        }
     }
 } 

@@ -4,6 +4,7 @@ struct SlidingCards: View {
     var photoItems: [PhotoItem]
     var currentCollection: PhotoCollection?
     var uncollectedLetters: [String]
+    var onCameraRequest: ((String) -> Void)?
     
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -19,7 +20,8 @@ struct SlidingCards: View {
                     ForEach(uncollectedLetters, id: \.self) { letter in
                         Card(
                             title: letter,
-                            currentCollection: currentCollection
+                            currentCollection: currentCollection,
+                            onCameraRequest: onCameraRequest
                         )
                         .scrollTransition(.animated) { content, phase in
                             content
@@ -38,5 +40,5 @@ struct SlidingCards: View {
 } 
 
 #Preview {
-    SlidingCards(photoItems: SampleData.photos, currentCollection: SampleData.collection, uncollectedLetters: [])
+    SlidingCards(photoItems: SampleData.photos, currentCollection: SampleData.collection, uncollectedLetters: [], onCameraRequest: nil)
 }

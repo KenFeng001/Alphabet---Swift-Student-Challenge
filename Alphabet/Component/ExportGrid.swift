@@ -1,12 +1,12 @@
 import SwiftUI
 import SwiftData
-import UIKit  // 添加 UIKit 导入以使用 UIImage
+import UIKit  // Add UIKit import to use UIImage
 
 struct ExportGrid: View {
     var collection: PhotoCollection
     let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 7)
     
-    // 按字母顺序排序的照片
+    // Photos sorted in alphabetical order
     private var sortedPhotos: [PhotoItem] {
         collection.photos.sorted { $0.letter < $1.letter }
     }
@@ -20,7 +20,7 @@ struct ExportGrid: View {
                         .scaledToFit()
                         .clipped()
                         .overlay(alignment: .bottomTrailing) {
-                            // 右下角显示字母
+                            // Display letter in bottom right corner
                             Text(photo.letter)
                                 .font(.system(size: 12, weight: .bold))
                                 .foregroundColor(.white)

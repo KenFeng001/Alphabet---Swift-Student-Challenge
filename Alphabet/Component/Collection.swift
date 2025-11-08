@@ -11,24 +11,24 @@ import SwiftData
 struct Collection: View {
     var photoCollection: PhotoCollection
     
-    // 获取主照片和小照片的计算属性
+    // Computed property to get main and small photos
     private var photos: (main: PhotoItem?, small: [PhotoItem]) {
         let allPhotos = photoCollection.photos
-            .sorted { $0.timestamp > $1.timestamp } // 按时间排序，最新的在前
+            .sorted { $0.timestamp > $1.timestamp } // Sort by time, newest first
         
         return (
-            main: allPhotos.first, // 最新的照片作为主照片
-            small: Array(allPhotos.dropFirst().prefix(2)) // 接下来的2张作为小照片
+            main: allPhotos.first, // Newest photo as main photo
+            small: Array(allPhotos.dropFirst().prefix(2)) // Next 2 photos as small photos
         )
     }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            // 只在有照片时显示图片区域
+            // Only show image area when photos exist
             if !photoCollection.photos.isEmpty {
                 GeometryReader { geometry in
                     HStack(spacing: 8) {
-                        // 主图
+                        // Main image
                         if let mainPhoto = photos.main,
                            let uiImage = UIImage(data: mainPhoto.imageData) {
                             Image(uiImage: uiImage)
@@ -43,9 +43,9 @@ struct Collection: View {
                                 .frame(width: geometry.size.width * 0.6)
                         }
                         
-                        // 右侧小图
+                        // Right side small images
                         if !photos.small.isEmpty {
-                            VStack(spacing: UIDevice.current.userInterfaceIdiom == .pad ? 12 : 8) { // 间距也相应增加
+                            VStack(spacing: UIDevice.current.userInterfaceIdiom == .pad ? 12 : 8) { // Spacing also increased proportionally
                                 ForEach(photos.small, id: \.id) { photo in
                                     if let uiImage = UIImage(data: photo.imageData) {
                                         Image(uiImage: uiImage)
@@ -57,7 +57,7 @@ struct Collection: View {
                                     }
                                 }
                                 
-                                // 补充占位符
+                                // Fill placeholder
                                 ForEach(0..<(2 - photos.small.count), id: \.self) { _ in
                                     RoundedRectangle(cornerRadius: 12)
                                         .fill(Color.gray.opacity(0.2))
@@ -70,7 +70,7 @@ struct Collection: View {
                 }
                 .frame(height: UIDevice.current.userInterfaceIdiom == .pad ? 375 : 250)            }
             
-            // 集合名称和进度
+            // Collection name and progress
             VStack(alignment: .leading, spacing: 4) {
                 Text(photoCollection.name)
                     .font(.title2)

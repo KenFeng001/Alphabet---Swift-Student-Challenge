@@ -18,7 +18,7 @@ struct Navigation: View {
                 }
             }
               
-            // 右侧的图标
+            // Right side icon
             Button(action: {
                 onTabChange(.find)
             }) {

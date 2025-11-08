@@ -2,17 +2,17 @@ import SwiftUI
 import SwiftData
 
 struct ViewfinderImagePreview: View {
-    @Environment(\.dismiss) private var dismiss // 用于返回的环境变量
+    @Environment(\.dismiss) private var dismiss // Environment variable for returning
     @Environment(\.modelContext) private var modelContext
     @Environment(\.presentationMode) private var presentationMode
     var thumbNailImage: Image
-    var imageData: Data // 接收 Image 类型的数据
-    var selectedLetter: String // 接收字母数据
-    var currentCollection: PhotoCollection? // 新增参数
+    var imageData: Data // Receives Image type data
+    var selectedLetter: String // Receives letter data
+    var currentCollection: PhotoCollection? // New parameter
     
     var body: some View {
         VStack(spacing: 0) {
-            // 顶部字母显示
+            // Top letter display
             Text("\(selectedLetter);\(selectedLetter.lowercased())")
                 .font(.system(size: 48, weight: .bold))
                 .foregroundColor(.white)
@@ -20,7 +20,7 @@ struct ViewfinderImagePreview: View {
                 .padding(.horizontal, 20)
                 .padding(.top, 40)
             
-            // 图片预览
+            // Image preview
             thumbNailImage
                 .resizable()
                 .scaledToFill()
@@ -29,9 +29,9 @@ struct ViewfinderImagePreview: View {
                 .padding(.horizontal, 20)
                 .padding(.vertical, 20)
             
-            // 底部控制栏
+            // Bottom control bar
             HStack {
-                // 返回按钮
+                // Back button
                 Button(action: {
                     dismiss()
                 }) {
@@ -47,10 +47,10 @@ struct ViewfinderImagePreview: View {
                 
                 Spacer()
                 
-                // 保存按钮
+                // Save button
                 Button(action: {
                     saveImage()
-                    // 直接关闭所有页面回到 Current_challenge
+                    // Close all pages and return to Current_challenge
                     dismiss()
                     presentationMode.wrappedValue.dismiss()
                 }) {
@@ -73,9 +73,9 @@ struct ViewfinderImagePreview: View {
         .ignoresSafeArea()
     }
 
-    // 保存图像的函数
+    // Function to save image
     private func saveImage() {
-        // 保存到 App 内
+        // Save to App
         let photoItem = PhotoItem(
             letter: selectedLetter, 
             imageData: imageData,
@@ -84,7 +84,7 @@ struct ViewfinderImagePreview: View {
         modelContext.insert(photoItem)
         currentCollection?.pinPhotoItem(for: selectedLetter, photoItem: photoItem)
         
-        // 保存到系统相册
+        // Save to system photo album
         if let uiImage = UIImage(data: imageData) {
             UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil)
         }
@@ -93,7 +93,7 @@ struct ViewfinderImagePreview: View {
     }
 }
 
-// 添加 Image 扩展来支持转换为 UIImage
+// Add Image extension to support conversion to UIImage
 extension Image {
     func asUIImage() -> UIImage? {
         let controller = UIHostingController(rootView: self)
@@ -111,11 +111,11 @@ extension Image {
     }
 }
 
-// 添加预览
+// Add preview
 #Preview {
     ViewfinderImagePreview(
         thumbNailImage: Image("Y"),
-        imageData: Data(), // 使用空的 Data 作为预览
+        imageData: Data(), // Use empty Data for preview
         selectedLetter: "A",
         currentCollection: nil
     )

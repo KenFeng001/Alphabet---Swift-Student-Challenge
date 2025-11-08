@@ -7,7 +7,6 @@ struct SmallCard: View {
     let letter: String
     var photoItems: [PhotoItem]
     @State private var showPhotoPicker = false
-    @State private var showCamera = false
     @Binding var showingImagePreview: Bool
     @Binding var selectedPreviewPhotos: [PhotoItem]
     @Binding var selectedPreviewLetter: String
@@ -16,6 +15,7 @@ struct SmallCard: View {
     var currentCollection: PhotoCollection?
     var isStacked: Bool
     var showUnfinished: Bool
+    var onCameraRequest: ((String) -> Void)?
     
     private var letterPhotos: [PhotoItem] {
         photoItems.filter { $0.letter == letter }
@@ -80,13 +80,13 @@ struct SmallCard: View {
                         Button(action: {
                             showPhotoPicker = true
                         }) {
-                            Label("更换照片", systemImage: "photo")
+                            Label("Replace Photo", systemImage: "photo")
                         }
                         
                         Button(action: {
-                            showCamera = true
+                            onCameraRequest?(letter)
                         }) {
-                            Label("拍摄新照片", systemImage: "camera.fill")
+                            Label("Take New Photo", systemImage: "camera.fill")
                         }
                     }
                     
@@ -96,19 +96,19 @@ struct SmallCard: View {
                         .padding(.top, UIDevice.current.userInterfaceIdiom == .pad ? 6 : 4)
                 }
             } else {
-                // 没有照片的情况
+                // Case when no photos exist
                 VStack {
                     Menu {
                         Button(action: {
                             showPhotoPicker = true
                         }) {
-                            Label("上传照片", systemImage: "photo")
+                            Label("Upload Photo", systemImage: "photo")
                         }
                         
                         Button(action: {
-                            showCamera = true
+                            onCameraRequest?(letter)
                         }) {
-                            Label("拍摄照片", systemImage: "camera.fill")
+                            Label("Take Photo", systemImage: "camera.fill")
                         }
                     } label: {
                         Image("smallcardbg")
@@ -138,12 +138,6 @@ struct SmallCard: View {
             ),
             matching: .images
         )
-        .navigationDestination(isPresented: $showCamera) {
-            ViewfinderView(
-                selectedLetter: letter,
-                currentCollection: currentCollection
-            )
-        }
     }
     
     private func loadImage(from item: PhotosPickerItem) {

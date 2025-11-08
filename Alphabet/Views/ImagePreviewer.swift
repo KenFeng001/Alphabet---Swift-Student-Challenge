@@ -19,7 +19,7 @@ struct ImagePreviewer: View {
         self.selectedLetter = selectedLetter
         self.isPresented = isPresented
         
-        // 初始化时，如果没有固定的照片，将最新的照片设为固定
+        // During initialization, if no pinned photo exists, set latest photo as pinned
         let pinnedPhoto = photos.first(where: { $0.isPinned })
         if pinnedPhoto == nil, let latestPhoto = photos.max(by: { $0.timestamp < $1.timestamp }) {
             _currentPhotos = State(initialValue: photos)
@@ -41,32 +41,32 @@ struct ImagePreviewer: View {
         guard currentPage < currentPhotos.count else { return }
         let photoToDelete = currentPhotos[currentPage]
         
-        // 如果是最后一张照片
+        // If it's the last photo
         if currentPhotos.count == 1 {
             modelContext.delete(photoToDelete)
             isPresented.wrappedValue = false
             return
         }
         
-        // 如果不是最后一张照片
-        // 先调整当前页码，确保不会越界
+        // If not the last photo
+        // First adjust current page to ensure no bounds overflow
         if currentPage == currentPhotos.count - 1 {
             currentPage -= 1
         }
         
-        // 从数组中移除照片
+        // Remove photo from array
         if let index = currentPhotos.firstIndex(where: { $0.id == photoToDelete.id }) {
             currentPhotos.remove(at: index)
         }
         
-        // 如果删除的是固定的照片，将最新的照片设为固定
+        // If deleted photo was pinned, set latest photo as pinned
         if photoToDelete.isPinned {
             if let latestPhoto = currentPhotos.max(by: { $0.timestamp < $1.timestamp }) {
                 latestPhoto.isPinned = true
             }
         }
         
-        // 删除数据库中的照片
+        // Delete photo from database
         modelContext.delete(photoToDelete)
     }
     
@@ -74,12 +74,12 @@ struct ImagePreviewer: View {
         guard currentPage < currentPhotos.count else { return }
         let photoToPin = currentPhotos[currentPage]
         
-        // 取消其他照片的固定状态
+        // Cancel pinned status for other photos
         for photo in currentPhotos where photo.isPinned {
             photo.isPinned = false
         }
         
-        // 设置当前照片为固定状态
+        // Set current photo as pinned
         photoToPin.isPinned = true
     }
     
@@ -92,11 +92,11 @@ struct ImagePreviewer: View {
             applicationActivities: nil
         )
         
-        // 获取当前的 UIWindow
+        // Get current UIWindow
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
            let window = windowScene.windows.first,
            let rootViewController = window.rootViewController {
-            // 在 iPad 上需要设置 popoverPresentationController
+            // Need to set popoverPresentationController on iPad
             if let popover = activityVC.popoverPresentationController {
                 popover.sourceView = window
                 popover.sourceRect = CGRect(x: window.bounds.midX, y: window.bounds.midY, width: 0, height: 0)
@@ -109,7 +109,7 @@ struct ImagePreviewer: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // 图片展示区域
+            // Image display area
             TabView(selection: $currentPage) {
                 ForEach(Array(currentPhotos.enumerated()), id: \.element.id) { index, photo in
                     if let uiImage = UIImage(data: photo.imageData) {
@@ -126,12 +126,12 @@ struct ImagePreviewer: View {
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
             .indexViewStyle(.page(backgroundDisplayMode: .always))
             .onAppear {
-                // 自定义 PageControl 的外观
+                // Customize PageControl appearance
                 UIPageControl.appearance().currentPageIndicatorTintColor = .black
                 UIPageControl.appearance().pageIndicatorTintColor = UIColor.black.withAlphaComponent(0.2)
             }
             
-            // 底部工具栏
+            // Bottom toolbar
             HStack(spacing: 40) {
                 Button {
                     pinCurrentPhoto()

@@ -367,35 +367,35 @@ class Camera: NSObject {
     }
     
     private var currentZoomFactor: CGFloat = 1.0
-    private var isUsingTelephoto = false  // 添加一个标记来跟踪是否使用长焦镜头
+    private var isUsingTelephoto = false  // Add flag to track if using telephoto lens
     
     func toggleZoom() {
         sessionQueue.async {
             if let telephotoDevice = self.telephotoDevice {
-                // 如果有长焦镜头
+                // If telephoto lens is available
                 if self.isUsingTelephoto {
-                    // 如果当前是长焦，切回主摄
+                    // If currently telephoto, switch back to main
                     self.captureDevice = self.backCaptureDevices.first
                     self.isUsingTelephoto = false
                     self.currentZoomFactor = 1.0
                 } else {
-                    // 切换到长焦
+                    // Switch to telephoto
                     self.captureDevice = telephotoDevice
                     self.isUsingTelephoto = true
                     self.currentZoomFactor = 2.0
                 }
             } else {
-                // 如果没有长焦镜头，使用数码变焦
+                // If no telephoto lens, use digital zoom
                 guard let device = self.captureDevice else { return }
                 
                 do {
                     try device.lockForConfiguration()
                     if self.currentZoomFactor > 1.0 {
-                        // 如果当前已经放大，则还原到 1x
+                        // If currently zoomed, reset to 1x
                         device.videoZoomFactor = 1.0
                         self.currentZoomFactor = 1.0
                     } else {
-                        // 如果当前是 1x，则放大到 2x
+                        // If currently 1x, zoom to 2x
                         device.videoZoomFactor = 2.0
                         self.currentZoomFactor = 2.0
                     }

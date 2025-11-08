@@ -15,12 +15,12 @@ struct AlphabetApp: App {
     let container: ModelContainer?
 
     init() {
-        // 初始化为可选值
+        // Initialize as optional value
         container = try? ModelContainer(for: PhotoItem.self, PhotoCollection.self)
         
         if container == nil {
-            // 如果初始化失败，记录错误但不立即崩溃
-            print("警告: ModelContainer 初始化失败")
+            // If initialization fails, log error but don't crash immediately
+            print("Warning: ModelContainer initialization failed")
         }
     }
 
@@ -31,15 +31,15 @@ struct AlphabetApp: App {
                     ContentView()
                         .modelContainer(container)
                         .task {
-                            // 将首次启动检查移到这里
+                            // Move first launch check here
                             if !UserDefaults.standard.bool(forKey: "hasLaunchedBefore") {
                                 createStarterCollectionIfNeeded()
                                 UserDefaults.standard.set(true, forKey: "hasLaunchedBefore")
                             }
                         }
                 } else {
-                    // 显示错误视图
-                    ErrorView(message: "数据初始化失败，请重启应用或联系支持。")
+                    // Show error view
+                    ErrorView(message: "Data initialization failed. Please restart the app or contact support.")
                 }
             }
         }
@@ -52,13 +52,13 @@ struct AlphabetApp: App {
                 let descriptor = FetchDescriptor<PhotoCollection>()
                 let existingCollections = try context.fetch(descriptor)
                 
-                // 如果没有任何 collection，导入示例数据
+                // If no collections exist, import sample data
                 if existingCollections.isEmpty {
-                    // 导入 SampleData0 中的数据
+                    // Import data from SampleData0
                     let starterCollection = SampleData0.collection
                     context.insert(starterCollection)
                     
-                    // 导入 SampleData 中的数据
+                    // Import data from SampleData
                     let sampleCollection = SampleData.collection
                     context.insert(sampleCollection)
                     
@@ -66,7 +66,7 @@ struct AlphabetApp: App {
                         context.insert(photo)
                     }
                     
-                    // 导入 SampleData2 中的数据
+                    // Import data from SampleData2
                     let sampleCollection2 = SampleData2.collection
                     context.insert(sampleCollection2)
                     
@@ -75,16 +75,16 @@ struct AlphabetApp: App {
                     }
                     
                     try context.save()
-                    print("成功导入所有示例数据")
+                    print("Successfully imported all sample data")
                 }
             } catch {
-                print("创建或导入 Collection 失败: \(error)")
+                print("Failed to create or import Collection: \(error)")
             }
         }
     }
 }
 
-// 添加一个简单的错误视图
+// Add a simple error view
 struct ErrorView: View {
     let message: String
     

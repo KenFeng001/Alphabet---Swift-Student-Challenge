@@ -19,7 +19,7 @@ struct ShareCollection: View {
                     } label: {
                         HStack {
                             Image(systemName: "chevron.left")
-                            Text("返回")
+                            Text("Back")
                         }
                         .foregroundColor(.blue)
                     }
@@ -43,7 +43,7 @@ struct ShareCollection: View {
                     // Option 1
                     Button {
                         selectedOption = 0
-                        isTextFieldFocused = false  // 选择选项1时取消文本框焦点
+                        isTextFieldFocused = false  // Cancel text field focus when selecting option 1
                     } label: {
                         HStack {
                             Text("Stitch all the letters")
@@ -62,7 +62,7 @@ struct ShareCollection: View {
                     // Option 2
                     Button {
                         selectedOption = 1
-                        isTextFieldFocused = true  // 选择选项2时聚焦文本框
+                        isTextFieldFocused = true  // Focus text field when selecting option 2
                     } label: {
                         HStack {
                             Text("Stitch typed letters")
@@ -81,9 +81,9 @@ struct ShareCollection: View {
                     // Text field
                     if selectedOption == 1 {
                         TextEditor(text: $typedText)
-                            .frame(height: 100)  // 设置固定高度
+                            .frame(height: 100)  // Set fixed height
                             .multilineTextAlignment(.center)
-                            .focused($isTextFieldFocused)  // 使用 FocusState
+                            .focused($isTextFieldFocused)  // Use FocusState
                             .overlay(
                                 RoundedRectangle(cornerRadius: 8)
                                     .stroke(Color.gray.opacity(0.2), lineWidth: 1)
@@ -100,7 +100,7 @@ struct ShareCollection: View {
                 Button {
                     navigateToStitch = true
                 } label: {
-                    Text("继续")
+                    Text("Continue")
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(Color.blue)
